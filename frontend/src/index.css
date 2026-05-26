@@ -1,67 +1,59 @@
 @import "tailwindcss";
 
 @theme {
-  /* SonicScript Brand Color (Warm Bronze/Amber human aesthetic replacing standard tech blue) */
-  --color-brand-indigo: #D99C53;
-  --color-brand-indigo-hover: #C88A42;
-  --color-dark-bg: #090D16;
-  --color-dark-surface: #101625;
-  --color-dark-card: #141B2D;
-  --color-dark-border: rgba(255, 255, 255, 0.06);
-  --color-dark-border-hover: rgba(255, 255, 255, 0.12);
-  --color-text-primary: #F3F4F6;
-  --color-text-secondary: #9CA3AF;
+  /* SonicScript Color Palette - Periwinkle Theme */
+  --color-brand-primary: #8A9FE8;
+  --color-brand-primary-hover: #6B82D6;
+  
+  --color-stone-bg: #F3F5FC;
+  --color-stone-secondary: #E4E8F4;
+  --color-stone-card: #FFFFFF;
+  --color-stone-text-primary: #1A233D;
+  --color-stone-text-secondary: #505A73;
+  --color-stone-border: #D2D8EC;
   
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090D16;
+  background: #F3F5FC;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: #D2D8EC;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #8A9FE8;
 }
 
-/* Premium Custom Glow Ambient Lights */
-.bg-mesh-glow {
-  position: absolute;
-  width: 500px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(217, 156, 83, 0.08) 0%, rgba(217, 156, 83, 0.01) 70%, transparent 100%);
-  filter: blur(80px);
-  pointer-events: none;
-  z-index: 0;
+/* Minimal design panels with periwinkle tints */
+.minimal-panel {
+  background: #FFFFFF;
+  border: 1px solid #D2D8EC;
+  box-shadow: 0 1px 3px 0 rgba(138, 159, 232, 0.05), 0 1px 2px -1px rgba(138, 159, 232, 0.05);
+  border-radius: 12px;
 }
 
-/* Glassmorphism utility card */
-.glass-panel {
-  background: rgba(20, 27, 45, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+.minimal-panel-interactive {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-panel-interactive {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+.minimal-panel-interactive:hover {
+  border-color: #8A9FE8;
+  box-shadow: 0 4px 6px -1px rgba(138, 159, 232, 0.08), 0 2px 4px -2px rgba(138, 159, 232, 0.08);
 }
 
-.glass-panel-interactive:hover {
-  background: rgba(24, 33, 55, 0.7);
-  border-color: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4), 0 0 20px 0 rgba(217, 156, 83, 0.04);
+/* Highlight transcribing words */
+.word-active {
+  color: #1A233D;
+  font-weight: 600;
+  border-bottom: 2px solid #8A9FE8;
 }
-
