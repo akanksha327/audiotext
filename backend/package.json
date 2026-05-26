@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "Backend API for SonicScript AI Transcription Platform",
   "main": "dist/server.js",
+  "type": "module",
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc",
-    "dev": "nodemon src/server.ts"
+    "dev": "tsx watch src/server.ts"
   },
   "keywords": [
     "express",
@@ -29,6 +30,7 @@
     "@types/node": "^20.12.7",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.0",
     "typescript": "^5.4.5"
   }
 }
