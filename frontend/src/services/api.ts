@@ -16,6 +16,10 @@ export interface TranscriptData {
   text: string;
   status: 'pending' | 'completed' | 'failed';
   language: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  accuracy?: number;
   createdAt?: string;
 }
 
@@ -28,6 +32,7 @@ let offlineTranscripts: TranscriptData[] = [
     text: 'Welcome everyone to the SonicScript kickoff meeting. Today we are launching our new AI speech-to-text SaaS foundation. We will focus on extreme visual premium feel, responsive panels, high accessibility, and instant downloads. The goal is to provide human-crafted layouts with zero template clutter.',
     status: 'completed',
     language: 'en',
+    accuracy: 97,
     createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
   },
   {
@@ -37,6 +42,7 @@ let offlineTranscripts: TranscriptData[] = [
     text: 'I think we should stick to a clean, today-human aesthetic. Let us avoid artificial neon greens and purples. Deep charcoal gray surfaces, premium system typography like Inter, subtle cards with glassmorphic borders, and very soft, elegant buttons. Every interaction needs a micro-transition to feel organic and premium.',
     status: 'completed',
     language: 'en',
+    accuracy: 94,
     createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
   }
 ];
@@ -102,6 +108,44 @@ export const transcriptService = {
       console.warn('Backend API connection failed. Deleting local record.');
       offlineTranscripts = offlineTranscripts.filter(t => t._id !== id);
       return true;
+    }
+  }
+};
+
+export interface UserData {
+  name: string;
+  email: string;
+  avatar: string;
+  accountType: string;
+  storageLimit: number;
+  storageUsed: number;
+}
+
+export const userService = {
+  /**
+   * Fetch current seeded sandbox user profile settings
+   */
+  async getProfile(): Promise<UserData> {
+    try {
+      const response = await apiClient.get('/users/profile');
+      if (response.data && response.data.success) {
+        return response.data.data;
+      }
+      return response.data;
+    } catch (error) {
+      console.warn('Backend API connection failed. Using offline profile fallback.');
+      
+      // Calculate offline fallback storage by totaling local files
+      const totalOfflineSize = offlineTranscripts.reduce((sum, item) => sum + (item.fileSize || item.duration * 16000), 0);
+
+      return {
+        name: 'Sandbox User',
+        email: 'user@sonicscript.ai',
+        avatar: 'SS',
+        accountType: 'Premium AI Sandbox',
+        storageLimit: 100 * 1024 * 1024, // 100MB
+        storageUsed: 4.2 * 1024 * 1024 + totalOfflineSize,
+      };
     }
   }
 };

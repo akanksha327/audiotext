@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Transcript } from '../models/Transcript.js';
+import { User } from '../models/User.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 
 // Pre-populated transcripts for demo fallback when DB is empty or disconnected
@@ -58,7 +59,6 @@ export const getTranscripts = async (req: Request, res: Response, next: NextFunc
     }
 
     if (transcripts.length === 0) {
-      // Return demo data if DB is empty or connection fails
       ApiResponse.success(res, demoTranscripts, 'Fetched demo transcripts successfully');
       return;
     }
@@ -74,21 +74,39 @@ export const getTranscripts = async (req: Request, res: Response, next: NextFunc
  */
 export const createTranscript = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { title, duration, text, status, language } = req.body;
+    const { title, duration, text, status, language, fileName, fileSize, mimeType, accuracy } = req.body;
 
     const transcriptDuration = duration || Math.floor(Math.random() * 90) + 10; // default 10-100s
     const transcriptTitle = title || 'Speech Record';
     const transcriptText = text || generateMockText(transcriptDuration);
+    const finalSize = fileSize || Math.floor(transcriptDuration * 16000);
+    const finalAccuracy = accuracy || Math.floor(Math.random() * 6) + 93; // 93-98%
 
     let newTranscript: any;
     try {
+      // Find default seeded user
+      const defaultUser = await User.findOne({ email: 'user@sonicscript.ai' });
+      const userId = defaultUser ? defaultUser._id : undefined;
+
       newTranscript = await Transcript.create({
         title: transcriptTitle,
         duration: transcriptDuration,
         text: transcriptText,
         status: status || 'completed',
         language: language || 'en',
+        user: userId,
+        fileName: fileName || 'Upload.mp3',
+        fileSize: finalSize,
+        mimeType: mimeType || 'audio/mpeg',
+        accuracy: finalAccuracy
       });
+
+      // Increment user storageUsed
+      if (defaultUser) {
+        defaultUser.storageUsed += finalSize;
+        await defaultUser.save();
+      }
+
       console.log(`Saved new transcript to database: ${newTranscript._id}`);
     } catch (dbError) {
       console.warn('Database save failed or bypassed, creating transient in-memory transcript.');
@@ -99,6 +117,7 @@ export const createTranscript = async (req: Request, res: Response, next: NextFu
         text: transcriptText,
         status: status || 'completed',
         language: language || 'en',
+        accuracy: finalAccuracy,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -118,19 +137,29 @@ export const deleteTranscript = async (req: Request, res: Response, next: NextFu
     const { id } = req.params;
 
     if (id.startsWith('demo-') || id.startsWith('transient-')) {
-      // Mock successful deletion of mockup items
       ApiResponse.success(res, { id }, 'Demo transcript deleted successfully');
       return;
     }
 
     let result = null;
     try {
-      result = await Transcript.findByIdAndDelete(id);
+      result = await Transcript.findById(id);
+      if (result) {
+        const deletedSize = result.fileSize || 0;
+        await Transcript.findByIdAndDelete(id);
+
+        // Decrement user storageUsed
+        const defaultUser = await User.findOne({ email: 'user@sonicscript.ai' });
+        if (defaultUser && defaultUser.storageUsed >= deletedSize) {
+          defaultUser.storageUsed -= deletedSize;
+          await defaultUser.save();
+        }
+      }
     } catch (dbError) {
       console.warn('Database deletion failed due to DB offline.');
     }
 
-    if (!result && !id.startsWith('demo-') && !id.startsWith('transient-')) {
+    if (!result) {
       ApiResponse.error(res, 'Transcript not found in database', 404);
       return;
     }

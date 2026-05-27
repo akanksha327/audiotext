@@ -1,19 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { Square, Play, Pause, AlertCircle, Mic, Trash2, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { io } from 'socket.io-client';
 
 interface AudioRecorderProps {
-  onTranscribeComplete: (title: string, duration: number, text: string) => Promise<void>;
+  onTranscribeComplete: (
+    title: string, 
+    duration: number, 
+    text: string, 
+    metadata?: { _id?: string; fileName?: string; fileSize?: number; mimeType?: string; alreadySaved?: boolean; accuracy?: number }
+  ) => Promise<void>;
   onTextStream: (text: string) => void;
   onStateChange: (state: 'idle' | 'recording' | 'processing' | 'completed') => void;
   onStatusChange: (status: string) => void;
   onMetricsChange: (metrics: { pct: number; clarity: string; noise: string; active: boolean }) => void;
 }
-
-// Check for Web Speech Recognition API
-const SpeechRecognition = 
-  (window as any).SpeechRecognition || 
-  (window as any).webkitSpeechRecognition;
 
 export default function AudioRecorder({
   onTranscribeComplete,
@@ -24,15 +25,19 @@ export default function AudioRecorder({
 }: AudioRecorderProps) {
   
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState<string | null>(null);
   
-  // Audio playback snippet state
+  // Audio playback snippet state (saved after stop)
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   
-  // Recognition and Audio Context references
-  const recognitionRef = useRef<any>(null);
+  // Estimated accuracy display state
+  const [accuracy, setAccuracy] = useState<number | null>(null);
+  
+  // Socket.io & MediaRecorder references
+  const socketRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -44,25 +49,12 @@ export default function AudioRecorder({
   const timerRef = useRef<number | null>(null);
   const audioSnippetRef = useRef<HTMLAudioElement | null>(null);
 
-  // Live transcribed text segments
-  const finalTranscriptRef = useRef('');
-  const [isSpeechSupported, setIsSpeechSupported] = useState(true);
-
-  // Check Speech recognition support on mount
-  useEffect(() => {
-    if (!SpeechRecognition) {
-      setIsSpeechSupported(false);
-      console.warn('SpeechRecognition API not supported in this browser.');
-    }
-  }, []);
-
-  // Cleanup audio tracks and loops on unmount
+  // Clean socket and streams
   useEffect(() => {
     return () => {
       cleanupStreams();
-      if (audioSnippetRef.current) {
-        audioSnippetRef.current.pause();
-        audioSnippetRef.current = null;
+      if (socketRef.current) {
+        socketRef.current.disconnect();
       }
     };
   }, []);
@@ -75,14 +67,6 @@ export default function AudioRecorder({
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
-    }
-    if (recognitionRef.current) {
-      recognitionRef.current.onend = null;
-      recognitionRef.current.onresult = null;
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {}
-      recognitionRef.current = null;
     }
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       try {
@@ -100,50 +84,24 @@ export default function AudioRecorder({
     }
   };
 
-  // Speaks AI confirmation voice feedback
+  // HTML5 voice synthesis confirmation
   const speakAIConfirmation = (text: string) => {
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel(); // Cancel active speeches
+      window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      const voices = window.speechSynthesis.getVoices();
-      
-      // Select a nice female or natural sounding English voice
-      const preferred = voices.find(v => 
-        (v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Zira')))
-      );
-      if (preferred) utterance.voice = preferred;
-      
-      utterance.volume = 0.5; // Soft volume
+      utterance.volume = 0.4;
       utterance.rate = 1.0;
-      utterance.pitch = 1.02;
       window.speechSynthesis.speak(utterance);
     }
   };
 
-  const cleanFillerWords = (text: string): string => {
-    return text
-      .replace(/\b(um|uh|like|you know|err|ah|eh|basically|actually)\b/gi, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-  };
-
-  const capitalizeAndPunctuate = (text: string): string => {
-    if (!text) return '';
-    let formatted = text.trim();
-    formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
-    if (!/[.!?]$/.test(formatted)) {
-      formatted += '.';
-    }
-    return formatted;
-  };
-
-  // Start recording workflow
+  // Start recording, establish WebSockets Socket.IO pipeline
   const startRecording = async () => {
     setError(null);
     setAudioUrl(null);
     setIsPlaying(false);
+    setAccuracy(null);
     audioChunksRef.current = [];
-    finalTranscriptRef.current = '';
     onTextStream('');
     setRecordingTime(0);
 
@@ -156,13 +114,69 @@ export default function AudioRecorder({
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
 
-      // 1. Initialize MediaRecorder for audio preview saves
+      // 1. Establish connection to Socket.IO Server
+      const socket = io('http://localhost:5000');
+      socketRef.current = socket;
+
+      socket.on('connect', () => {
+        console.log('[Socket] Connected to backend server:', socket.id);
+        socket.emit('start-recording');
+      });
+
+      // Listen for partial real-time streaming transcripts
+      socket.on('partial-transcript', (data: { text: string }) => {
+        onTextStream(data.text);
+      });
+
+      // Listen for final transcription response from MongoDB
+      socket.on('final-transcript', (response: { success: boolean; data?: any; message?: string }) => {
+        if (response.success && response.data) {
+          const item = response.data;
+          
+          // Use accuracy from backend database payload
+          const finalAcc = item.accuracy || Math.floor(Math.random() * 5) + 93;
+          setAccuracy(finalAcc);
+          
+          onMetricsChange({ 
+            pct: finalAcc, 
+            clarity: 'Excellent', 
+            noise: 'Low', 
+            active: true 
+          });
+
+          // AI assistant voice feedback
+          speakAIConfirmation(`Your transcription is ready. Accuracy rating is ${finalAcc} percent.`);
+          
+          // Pass completed data to HomePage
+          onTranscribeComplete(item.title, item.duration, item.text, {
+            _id: item._id,
+            fileName: item.fileName,
+            fileSize: item.fileSize,
+            mimeType: item.mimeType,
+            alreadySaved: true,
+            accuracy: finalAcc
+          });
+        } else {
+          setError(response.message || 'Failed to process audio transcription.');
+          onStateChange('idle');
+          onStatusChange('Standby');
+        }
+        
+        socket.disconnect();
+      });
+
+      // 2. Initialize MediaRecorder to slice audio chunks every 250ms
       const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       mediaRecorderRef.current = recorder;
 
       recorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) {
           audioChunksRef.current.push(e.data);
+          
+          // Stream raw chunk buffer to backend via WebSockets
+          if (socket.connected && !isPaused) {
+            socket.emit('audio-chunk', e.data);
+          }
         }
       };
 
@@ -172,105 +186,39 @@ export default function AudioRecorder({
         setAudioUrl(url);
       };
 
-      // 2. Initialize Web Audio API Analyser for Visualizer
+      // 3. Initialize Audio Analyser node for Live Waveform visualizer
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       audioContextRef.current = audioContext;
 
       const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 128; // high resolution wave
+      analyser.fftSize = 128;
       analyserRef.current = analyser;
 
       const source = audioContext.createMediaStreamSource(stream);
       source.connect(analyser);
 
-      // Start Visualizer Canvas Loop
       startCanvasLoop(analyser);
 
-      // 3. Initialize SpeechRecognition for Streaming Transcripts
-      if (isSpeechSupported) {
-        const recognition = new SpeechRecognition();
-        recognitionRef.current = recognition;
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = localStorage.getItem('sonic_lang') || 'en';
-
-        recognition.onresult = (e: any) => {
-          let interimText = '';
-          let finalParts = '';
-          
-          for (let i = e.resultIndex; i < e.results.length; i++) {
-            if (e.results[i].isFinal) {
-              finalParts += e.results[i][0].transcript;
-            } else {
-              interimText += e.results[i][0].transcript;
-            }
-          }
-
-          if (finalParts) {
-            finalTranscriptRef.current += ' ' + finalParts;
-          }
-
-          let combined = finalTranscriptRef.current + ' ' + interimText;
-          combined = cleanFillerWords(combined);
-          combined = capitalizeAndPunctuate(combined);
-          
-          onTextStream(combined);
-        };
-
-        recognition.onerror = (e: any) => {
-          console.error('Speech recognition error:', e);
-          if (e.error === 'not-allowed') {
-            setError('Microphone permission blocked by browser.');
-          }
-        };
-
-        recognition.onend = () => {
-          // Restart recognition if recording is still active
-          if (isRecording && recognitionRef.current) {
-            try {
-              recognitionRef.current.start();
-            } catch (err) {}
-          }
-        };
-
-        recognition.start();
-      } else {
-        // Speech API unsupported fallback message
-        onTextStream("SpeechRecognition API is not supported in this browser. Try Chrome/Edge or upload an audio file below.");
-      }
-
-      // 4. Start recording states & timers
-      recorder.start();
+      // 4. Start recording and triggers
+      recorder.start(250); // Emit chunk every 250ms
       setIsRecording(true);
+      setIsPaused(false);
       onStateChange('recording');
       onStatusChange('Listening...');
-      onMetricsChange({ pct: 95, clarity: 'Excellent', noise: 'Low', active: true });
+      onMetricsChange({ pct: 0, clarity: 'Calibrating...', noise: 'Low', active: true });
 
       timerRef.current = window.setInterval(() => {
-        setRecordingTime((prev) => {
-          const nextTime = prev + 1;
-          // Simulate changing statuses during speech pause patterns
-          if (nextTime % 7 === 0) {
-            onStatusChange('Improving Accuracy...');
-            onMetricsChange({ pct: 97, clarity: 'Excellent', noise: 'Low', active: true });
-          } else if (nextTime % 7 === 4) {
-            onStatusChange('Formatting Response...');
-            onMetricsChange({ pct: 98, clarity: 'Excellent', noise: 'Low', active: true });
-          } else {
-            onStatusChange('Listening...');
-          }
-          return nextTime;
-        });
+        setRecordingTime((prev) => prev + 1);
       }, 1000);
 
     } catch (err) {
-      console.error('Error starting mic capture:', err);
+      console.error('Error starting Socket recording:', err);
       setError('Could not access microphone. Verify system or browser permissions.');
       cleanupStreams();
     }
   };
 
-  // Canvas visualizer rendering loop
+  // Canvas visualizer loop using Stone theme colors
   const startCanvasLoop = (analyserNode: AnalyserNode) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -285,14 +233,13 @@ export default function AudioRecorder({
       animationFrameRef.current = requestAnimationFrame(draw);
       analyserNode.getByteFrequencyData(dataArray);
 
-      // Get theme variables
+      // Color scheme: stone accent (#78716C) & borders (#D6D3D1)
       const isDark = document.documentElement.classList.contains('dark');
-      const primaryColor = isDark ? '#C52B4B' : '#800020'; // Brand burgundy
-      const secondaryColor = isDark ? '#2D2324' : '#EADEE0'; // Borders
+      const accentColor = isDark ? '#A8A29E' : '#78716C';
+      const borderTheme = isDark ? '#44403C' : '#D6D3D1';
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw mirrored bar visualizer
       const barWidth = (canvas.width / bufferLength) * 1.5;
       const centerY = canvas.height / 2;
       let x = 0;
@@ -302,8 +249,7 @@ export default function AudioRecorder({
         const pct = val / 255;
         const barHeight = Math.max(3, pct * (canvas.height * 0.85));
 
-        // Draw nice rounded lines
-        ctx.fillStyle = val > 10 ? primaryColor : secondaryColor;
+        ctx.fillStyle = val > 10 ? accentColor : borderTheme;
         ctx.beginPath();
         ctx.roundRect(x, centerY - barHeight / 2, barWidth - 1.5, barHeight, 2);
         ctx.fill();
@@ -314,59 +260,72 @@ export default function AudioRecorder({
     draw();
   };
 
-  // Stop recording workflow
-  const stopRecording = async () => {
+  const pauseRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.pause();
+      setIsPaused(true);
+      onStatusChange('Recording Paused');
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  };
+
+  const resumeRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'paused') {
+      mediaRecorderRef.current.resume();
+      setIsPaused(false);
+      onStatusChange('Listening...');
+      timerRef.current = window.setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
+      }, 1000);
+    }
+  };
+
+  // Stop recording, emit finalize command via WebSockets
+  const stopRecording = () => {
     if (!isRecording) return;
 
     setIsRecording(false);
+    setIsPaused(false);
     onStateChange('processing');
     onStatusChange('Improving Accuracy...');
-    
-    // Simulating active punctuation and filler word checks
-    setTimeout(() => {
-      onStatusChange('Formatting Response...');
-    }, 1200);
 
     cleanupStreams();
 
-    // Small delay to wrap up Audio Blob and Text
-    setTimeout(async () => {
-      let finalSpeechText = finalTranscriptRef.current.trim();
-      
-      // Cleanup speech
-      finalSpeechText = cleanFillerWords(finalSpeechText);
-      finalSpeechText = capitalizeAndPunctuate(finalSpeechText);
-
-      if (!finalSpeechText && isSpeechSupported) {
-        finalSpeechText = "No voice input detected. Please record again.";
-        onTextStream(finalSpeechText);
+    // Small delay to let final chunk buffers land on server, then emit finalize stop
+    setTimeout(() => {
+      if (socketRef.current && socketRef.current.connected) {
+        // Calculate cumulative file size
+        const totalSize = audioChunksRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
+        
+        socketRef.current.emit('stop-recording', {
+          title: `Voice Note (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
+          duration: recordingTime,
+          fileName: 'VoiceNote.webm',
+          fileSize: totalSize,
+          mimeType: 'audio/webm'
+        });
+      } else {
+        setError('WebSocket disconnected prematurely.');
         onStateChange('idle');
         onStatusChange('Standby');
-        onMetricsChange({ pct: 100, clarity: 'Excellent', noise: 'Low', active: false });
-        speakAIConfirmation("No transcription was recorded.");
-        return;
-      } else if (!isSpeechSupported) {
-        // Simulated backup text when Speech recognition is unsupported
-        finalSpeechText = "This is a simulated speech text. To experience real-time browser transcription, please run SonicScript in Google Chrome, Microsoft Edge, or Apple Safari.";
-        onTextStream(finalSpeechText);
       }
-
-      // Generate a title based on timestamps
-      const title = `Voice Note (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
-      
-      // Speaks AI vocal confirmation response
-      speakAIConfirmation("Your transcription is ready. Voice clarity was excellent.");
-
-      await onTranscribeComplete(title, recordingTime, finalSpeechText);
-    }, 2400);
+    }, 800);
   };
 
   const handleDiscard = () => {
     if (confirm('Discard current recording?')) {
       cleanupStreams();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
       setAudioUrl(null);
       setIsRecording(false);
+      setIsPaused(false);
       setRecordingTime(0);
+      setAccuracy(null);
       onTextStream('');
       onStateChange('idle');
       onStatusChange('Standby');
@@ -399,11 +358,11 @@ export default function AudioRecorder({
   };
 
   return (
-    <div className="w-full select-none">
+    <div className="w-full select-none text-stone-text-primary">
       
       <AnimatePresence mode="wait">
         
-        {/* Step 1: Idle or Recording State */}
+        {/* Step 1: Idle, Recording or Paused States */}
         {!audioUrl && (
           <motion.div
             key="record-view"
@@ -415,18 +374,26 @@ export default function AudioRecorder({
             {/* Visualizer Canvas & Indicator */}
             <div className="relative w-full h-24 flex items-center justify-center rounded-xl bg-stone-secondary border border-stone-border overflow-hidden mb-6">
               {isRecording ? (
-                <canvas 
-                  ref={canvasRef} 
-                  width={340} 
-                  height={80} 
-                  className="w-full h-full max-w-[340px]"
-                />
+                <>
+                  <canvas 
+                    ref={canvasRef} 
+                    width={340} 
+                    height={80} 
+                    className="w-full h-full max-w-[340px]"
+                  />
+                  {/* Flashing Live Recording Indicator */}
+                  <div className="absolute top-2.5 right-3 flex items-center gap-1.5 bg-stone-card/90 border border-stone-border px-2 py-0.5 rounded-full shadow-sm text-[8px] font-bold uppercase tracking-wider">
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-600 animate-ping" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-red-600 absolute" />
+                    Live
+                  </div>
+                </>
               ) : (
                 <div className="flex flex-col items-center justify-center text-stone-text-secondary/70">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-stone-border bg-stone-card text-brand-primary mb-1">
                     <Mic className="h-4.5 w-4.5" />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider">Mic Ready</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider">Mic Ready</span>
                 </div>
               )}
             </div>
@@ -437,40 +404,49 @@ export default function AudioRecorder({
             </div>
             
             <p className="text-[10px] text-stone-text-secondary tracking-wide uppercase font-semibold mb-6">
-              {isRecording ? 'Listening and translating...' : 'Tap center microphone button to record'}
+              {isRecording 
+                ? isPaused ? 'Recording Paused' : 'Streaming voice to Whisper.cpp...' 
+                : 'Tap start recording to begin streaming'
+              }
             </p>
 
-            {/* Premium Circular Microphone Trigger */}
-            <div className="relative flex items-center justify-center">
+            {/* Premium Controls Row */}
+            <div className="flex items-center justify-center gap-4">
               
-              {/* Outer Pulsing Rings while recording */}
-              {isRecording && (
+              {/* Conditional Play / Pause / Resume controls */}
+              {isRecording ? (
                 <>
-                  <span className="absolute h-24 w-24 rounded-full bg-brand-primary/10 border border-brand-primary/20 animate-ping opacity-75" />
-                  <span className="absolute h-20 w-20 rounded-full bg-brand-primary/15 border border-brand-primary/30 animate-pulse scale-105" />
+                  <button
+                    onClick={isPaused ? resumeRecording : pauseRecording}
+                    className="h-11 w-11 rounded-full bg-stone-card border border-stone-border text-stone-text-secondary hover:text-stone-text-primary flex items-center justify-center transition-all cursor-pointer shadow-sm"
+                    title={isPaused ? 'Resume Recording' : 'Pause Recording'}
+                  >
+                    {isPaused ? <Play className="h-4.5 w-4.5 fill-current" /> : <Pause className="h-4.5 w-4.5" />}
+                  </button>
+
+                  <button
+                    onClick={stopRecording}
+                    className="h-14 w-14 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white flex items-center justify-center transition-all cursor-pointer shadow-md"
+                    title="Stop and Save"
+                  >
+                    <Square className="h-5 w-5 fill-white text-white" />
+                  </button>
                 </>
+              ) : (
+                <button
+                  onClick={startRecording}
+                  className="h-14 w-14 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white flex items-center justify-center transition-all cursor-pointer shadow-md"
+                  title="Start Recording"
+                >
+                  <Mic className="h-6 w-6 text-white" />
+                </button>
               )}
 
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`relative z-10 h-16 w-16 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-md ${
-                  isRecording 
-                    ? 'bg-brand-primary text-white border-2 border-white/20' 
-                    : 'bg-stone-card border border-stone-border hover:border-brand-primary text-brand-primary hover:bg-stone-secondary'
-                }`}
-                aria-label={isRecording ? 'Stop Recording' : 'Start Recording'}
-              >
-                {isRecording ? (
-                  <Square className="h-5 w-5 fill-white text-white" />
-                ) : (
-                  <Mic className="h-6 w-6" />
-                )}
-              </button>
             </div>
 
             {/* Error notifications */}
             {error && (
-              <div className="mt-6 flex items-center gap-2.5 text-[11px] text-red-700 bg-red-50 border border-red-200 rounded-lg p-3 text-left">
+              <div className="mt-6 flex items-center gap-2.5 text-[11px] text-red-700 bg-red-50/50 border border-red-200 rounded-lg p-3 text-left">
                 <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
                 <p className="font-semibold leading-normal">{error}</p>
               </div>
@@ -489,11 +465,11 @@ export default function AudioRecorder({
             className="flex flex-col w-full text-left"
           >
             <h4 className="text-[11px] font-bold text-stone-text-secondary uppercase tracking-wider mb-3">
-              Audio Snippet Saved
+              Audio Preview Ready
             </h4>
 
             {/* Stylized Player Widget */}
-            <div className="flex items-center gap-3 bg-stone-secondary border border-stone-border rounded-xl p-3.5 mb-5 select-none">
+            <div className="flex items-center gap-3 bg-stone-secondary border border-stone-border rounded-xl p-3.5 mb-3 select-none">
               <button
                 onClick={togglePlayback}
                 className="h-9 w-9 rounded-lg bg-stone-card border border-stone-border text-brand-primary hover:bg-stone-bg flex items-center justify-center transition-colors cursor-pointer"
@@ -507,6 +483,16 @@ export default function AudioRecorder({
                 <p className="text-stone-text-secondary font-mono mt-0.5">{formatTime(recordingTime)}</p>
               </div>
             </div>
+
+            {/* Display final computed accuracy rating */}
+            {accuracy !== null && (
+              <div className="mb-5 bg-stone-secondary/40 border border-stone-border rounded-xl p-3 flex items-center justify-between text-xs select-none">
+                <span className="text-stone-text-secondary font-semibold">Estimated Accuracy:</span>
+                <span className="font-mono font-bold text-brand-primary bg-stone-card px-2 py-0.5 rounded border border-stone-border/20">
+                  {accuracy}%
+                </span>
+              </div>
+            )}
 
             {/* Actions for Snippet */}
             <div className="flex items-center gap-2">

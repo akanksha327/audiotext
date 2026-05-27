@@ -3,7 +3,12 @@ import { Upload, FileAudio, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface AudioUploadProps {
-  onTranscribeComplete: (title: string, duration: number, text: string) => Promise<void>;
+  onTranscribeComplete: (
+    title: string, 
+    duration: number, 
+    text: string, 
+    metadata?: { fileName?: string; fileSize?: number; mimeType?: string }
+  ) => Promise<void>;
 }
 
 const statusSteps = [
@@ -106,7 +111,11 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
       const simulatedDuration = Math.floor(Math.random() * 120) + 30; 
       const simulatedText = "Welcome to SonicScript transcription portal. This text simulates the transcript processed from your uploaded audio file. It covers speaker segments, timestamps, and punctuation automatically formatted by our backend AI.";
 
-      await onTranscribeComplete(fileTitle, simulatedDuration, simulatedText);
+      await onTranscribeComplete(fileTitle, simulatedDuration, simulatedText, {
+        fileName: file.name,
+        fileSize: file.size,
+        mimeType: file.type
+      });
       
       clearInterval(stepInterval);
       setSuccess(true);

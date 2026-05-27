@@ -25,27 +25,27 @@
 }
 
 :root {
-  --brand-primary: #800020;
-  --brand-primary-hover: #5A1220;
+  --brand-primary: #78716C;
+  --brand-primary-hover: #57534E;
   
-  --stone-bg: #FBF9F9;
-  --stone-secondary: #F3EFEF;
+  --stone-bg: #F5F5F4;
+  --stone-secondary: #E7E5E4;
   --stone-card: #FFFFFF;
-  --stone-text-primary: #2C1A1C;
-  --stone-text-secondary: #5C4E50;
-  --stone-border: #EADEE0;
+  --stone-text-primary: #1C1917;
+  --stone-text-secondary: #57534E;
+  --stone-border: #D6D3D1;
 }
 
 html.dark {
-  --brand-primary: #C52B4B;
-  --brand-primary-hover: #A31D38;
+  --brand-primary: #A8A29E;
+  --brand-primary-hover: #D6D3D1;
   
-  --stone-bg: #0B0909;
-  --stone-secondary: #141111;
-  --stone-card: #1C1919;
-  --stone-text-primary: #FAECEE;
-  --stone-text-secondary: #BFAFB1;
-  --stone-border: #292223;
+  --stone-bg: #1C1917;
+  --stone-secondary: #292524;
+  --stone-card: #23201F;
+  --stone-text-primary: #F5F5F4;
+  --stone-text-secondary: #A8A29E;
+  --stone-border: #44403C;
 }
 
 /* Enable smooth transitions across light/dark variables */

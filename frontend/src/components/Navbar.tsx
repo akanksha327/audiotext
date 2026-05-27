@@ -4,7 +4,7 @@ import {
   ChevronDown, Globe, Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { transcriptService, TranscriptData } from '../services/api.js';
+import { transcriptService, TranscriptData, userService, UserData } from '../services/api.js';
 
 interface NavbarProps {
   onScrollToApp?: () => void;
@@ -18,6 +18,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
   const [recents, setRecents] = useState<TranscriptData[]>([]);
   const [mics, setMics] = useState<MediaDeviceInfo[]>([]);
   const [selectedMic, setSelectedMic] = useState('default');
+  const [userProfile, setUserProfile] = useState<UserData | null>(null);
   
   // Settings preferences
   const [lang, setLang] = useState(() => localStorage.getItem('sonic_lang') || 'en');
@@ -58,6 +59,25 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
     }
   }, [activeDropdown]);
 
+  // Utility to format raw storage bytes
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  // Fetch user profile metrics
+  const fetchUserProfile = async () => {
+    try {
+      const profile = await userService.getProfile();
+      setUserProfile(profile);
+    } catch (err) {
+      console.warn('Failed to load profile in Navbar:', err);
+    }
+  };
+
   // Fetch recent saved recordings
   const fetchRecents = async () => {
     try {
@@ -70,10 +90,12 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
 
   useEffect(() => {
     fetchRecents();
+    fetchUserProfile();
     
     // Listen for updates from HomePage
     const handleUpdate = () => {
       fetchRecents();
+      fetchUserProfile();
     };
     window.addEventListener('transcripts-updated', handleUpdate);
     return () => window.removeEventListener('transcripts-updated', handleUpdate);
@@ -414,11 +436,11 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
                   {/* Profile Header */}
                   <div className="flex items-center gap-3 border-b border-stone-border pb-3 select-none">
                     <div className="h-10 w-10 rounded-full bg-brand-primary text-white flex items-center justify-center text-sm font-bold shadow-inner">
-                      SS
+                      {userProfile?.avatar || 'SS'}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-stone-text-primary truncate">Sandbox User</p>
-                      <p className="text-[10px] text-stone-text-secondary truncate">user@sonicscript.ai</p>
+                      <p className="text-xs font-bold text-stone-text-primary truncate">{userProfile?.name || 'Sandbox User'}</p>
+                      <p className="text-[10px] text-stone-text-secondary truncate">{userProfile?.email || 'user@sonicscript.ai'}</p>
                     </div>
                   </div>
 
@@ -427,17 +449,24 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
                     <div>
                       <span className="text-[9px] font-bold text-stone-text-secondary uppercase tracking-wider block mb-1">Account Tier</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[9px] font-bold bg-brand-primary/10 border border-brand-primary/20 text-brand-primary">
-                        Premium AI Sandbox
+                        {userProfile?.accountType || 'Premium AI Sandbox'}
                       </span>
                     </div>
 
                     <div>
                       <div className="flex items-center justify-between text-[9px] font-bold text-stone-text-secondary uppercase tracking-wider mb-1">
                         <span>Cloud Storage</span>
-                        <span className="font-mono">4.2 MB / 100 MB</span>
+                        <span className="font-mono">
+                          {formatBytes(userProfile?.storageUsed || 0)} / {formatBytes(userProfile?.storageLimit || 100 * 1024 * 1024)}
+                        </span>
                       </div>
                       <div className="w-full h-1.5 bg-stone-secondary border border-stone-border rounded-full overflow-hidden">
-                        <div className="h-full bg-brand-primary rounded-full" style={{ width: '4.2%' }} />
+                        <div 
+                          className="h-full bg-brand-primary rounded-full transition-all duration-500" 
+                          style={{ 
+                            width: `${Math.min(100, ((userProfile?.storageUsed || 0) / (userProfile?.storageLimit || 100 * 1024 * 1024)) * 100)}%` 
+                          }} 
+                        />
                       </div>
                     </div>
                   </div>
