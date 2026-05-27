@@ -3,7 +3,7 @@ import { Upload, FileAudio, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface AudioUploadProps {
-  onTranscribeComplete: (title: string, duration: number, text?: string) => Promise<void>;
+  onTranscribeComplete: (title: string, duration: number, text: string) => Promise<void>;
 }
 
 const statusSteps = [
@@ -104,8 +104,9 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
       
       const fileTitle = file.name.replace(/\.[^/.]+$/, "");
       const simulatedDuration = Math.floor(Math.random() * 120) + 30; 
+      const simulatedText = "Welcome to SonicScript transcription portal. This text simulates the transcript processed from your uploaded audio file. It covers speaker segments, timestamps, and punctuation automatically formatted by our backend AI.";
 
-      await onTranscribeComplete(fileTitle, simulatedDuration);
+      await onTranscribeComplete(fileTitle, simulatedDuration, simulatedText);
       
       clearInterval(stepInterval);
       setSuccess(true);
@@ -150,23 +151,23 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
             onClick={triggerFileInput}
             className={`flex flex-col items-center justify-center border border-dashed rounded-xl py-12 px-6 text-center cursor-pointer transition-all duration-200 ${
               dragActive
-                ? 'border-[#800020] bg-[#F3EFEF]/50'
-                : 'border-[#EADEE0] hover:border-[#800020] bg-white hover:bg-[#FBF9F9]/30'
+                ? 'border-brand-primary bg-stone-secondary/50'
+                : 'border-stone-border hover:border-brand-primary bg-stone-card hover:bg-stone-bg/30'
             }`}
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#EADEE0] bg-[#FBF9F9] mb-4 text-[#800020]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-stone-border bg-stone-bg mb-4 text-brand-primary">
               <Upload className="h-5 w-5" />
             </div>
             
-            <h3 className="text-xs font-semibold text-[#2C1A1C] mb-1">
+            <h3 className="text-xs font-semibold text-stone-text-primary mb-1">
               Drag and drop your audio file
             </h3>
             
-            <p className="text-[11px] text-[#5C4E50] mb-4 max-w-xs">
+            <p className="text-[11px] text-stone-text-secondary mb-4 max-w-xs">
               Supports MP3, WAV, or M4A (Max 25MB)
             </p>
             
-            <span className="text-xs font-medium text-[#2C1A1C] bg-[#F3EFEF] hover:bg-[#EADEE0] px-3.5 py-1.5 rounded-lg border border-[#EADEE0] transition-colors">
+            <span className="text-xs font-medium text-stone-text-primary bg-stone-secondary hover:bg-stone-border px-3.5 py-1.5 rounded-lg border border-stone-border transition-colors">
               Browse Files
             </span>
           </motion.div>
@@ -181,27 +182,27 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
             className="minimal-panel p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#EADEE0] bg-[#FBF9F9] text-[#800020]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-stone-border bg-stone-bg text-brand-primary">
                 <FileAudio className="h-5 w-5" />
               </div>
               <div className="text-left">
-                <h4 className="text-xs font-semibold text-[#2C1A1C] max-w-[200px] sm:max-w-[320px] truncate" title={file.name}>
+                <h4 className="text-xs font-semibold text-stone-text-primary max-w-[200px] sm:max-w-[320px] truncate" title={file.name}>
                   {file.name}
                 </h4>
-                <p className="text-[10px] text-[#5C4E50] mt-0.5">{formatSize(file.size)}</p>
+                <p className="text-[10px] text-stone-text-secondary mt-0.5">{formatSize(file.size)}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
               <button
                 onClick={removeFile}
-                className="flex-1 sm:flex-none text-xs text-[#5C4E50] hover:text-[#2C1A1C] bg-white hover:bg-[#FBF9F9] border border-[#EADEE0] rounded-lg px-3.5 py-2 font-medium transition-colors cursor-pointer"
+                className="flex-1 sm:flex-none text-xs text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-bg border border-stone-border rounded-lg px-3.5 py-2 font-medium transition-colors cursor-pointer"
               >
                 Discard
               </button>
               <button
                 onClick={processAudio}
-                className="flex-1 sm:flex-none text-xs text-white bg-[#800020] hover:bg-[#5A1220] rounded-lg px-4 py-2 font-medium transition-colors cursor-pointer"
+                className="flex-1 sm:flex-none text-xs text-white bg-brand-primary hover:bg-brand-primary-hover rounded-lg px-4 py-2 font-medium transition-colors cursor-pointer"
               >
                 Transcribe
               </button>
@@ -217,21 +218,21 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
             exit={{ opacity: 0 }}
             className="minimal-panel p-8 text-center flex flex-col items-center justify-center min-h-[220px]"
           >
-            <div className="flex h-8 w-8 items-center justify-center mb-4">
-              <RefreshCw className="h-5 w-5 text-[#800020] animate-spin" />
+            <div className="flex h-8 w-8 items-center justify-center mb-4 animate-spin text-brand-primary">
+              <RefreshCw className="h-5 w-5" />
             </div>
 
-            <h4 className="text-xs font-semibold text-[#2C1A1C] mb-1">
+            <h4 className="text-xs font-semibold text-stone-text-primary mb-1">
               Converting Speech
             </h4>
             
-            <p className="text-[11px] text-[#5C4E50] h-4 mb-4">
+            <p className="text-[11px] text-stone-text-secondary h-4 mb-4">
               {statusSteps[processStep]}
             </p>
 
-            <div className="w-48 h-1 bg-[#F3EFEF] rounded-full overflow-hidden border border-[#EADEE0]/50">
+            <div className="w-48 h-1 bg-stone-secondary rounded-full overflow-hidden border border-stone-border/50">
               <motion.div
-                className="h-full bg-[#800020]"
+                className="h-full bg-brand-primary"
                 initial={{ width: 0 }}
                 animate={{ width: `${((processStep + 1) / statusSteps.length) * 100}%` }}
                 transition={{ duration: 0.5 }}
@@ -248,21 +249,21 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
             exit={{ opacity: 0, scale: 0.98 }}
             className="minimal-panel p-8 text-center flex flex-col items-center justify-center min-h-[220px]"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#EADEE0] bg-[#FBF9F9] text-[#800020] mb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-border bg-stone-bg text-brand-primary mb-4">
               <Check className="h-5 w-5" />
             </div>
 
-            <h4 className="text-xs font-bold text-[#2C1A1C] mb-1">
+            <h4 className="text-xs font-bold text-stone-text-primary mb-1">
               Transcription Complete
             </h4>
             
-            <p className="text-[11px] text-[#5C4E50] mb-4 max-w-xs">
+            <p className="text-[11px] text-stone-text-secondary mb-4 max-w-xs">
               Your transcript was compiled and saved to your history.
             </p>
             
             <button
               onClick={() => setSuccess(false)}
-              className="text-xs font-medium text-[#5C4E50] hover:text-[#1A233D] bg-[#F3EFEF] hover:bg-[#EADEE0] border border-[#EADEE0] rounded-lg px-4 py-2 transition-colors cursor-pointer"
+              className="text-xs font-medium text-stone-text-secondary hover:text-brand-primary bg-stone-secondary hover:bg-stone-border border border-stone-border rounded-lg px-4 py-2 transition-colors cursor-pointer"
             >
               Upload another file
             </button>
@@ -280,7 +281,7 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
   );
 }
 
-// Minimal RefreshCw icon replacement locally
+// Local mock icon spinner
 function RefreshCw(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
