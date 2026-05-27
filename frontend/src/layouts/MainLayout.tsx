@@ -17,7 +17,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#090D16] text-[#F3F4F6] selection:bg-[#5A60EC]/30 selection:text-white">
+    <div className="flex flex-col min-h-screen bg-stone-bg text-stone-text-primary selection:bg-brand-primary/10 selection:text-brand-primary">
       {/* Sticky header navbar */}
       <Navbar onScrollToApp={triggerScroll} />
       

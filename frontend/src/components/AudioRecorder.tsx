@@ -116,13 +116,13 @@ export default function AudioRecorder({ onTranscribeComplete }: AudioRecorderPro
             exit={{ opacity: 0, y: -5 }}
             className="flex flex-col items-center justify-center p-4"
           >
-            {/* Minimal visualizer - just simple vertical periwinkle bars */}
-            <div className="h-16 w-full flex items-center justify-center gap-1 mb-6 rounded-xl bg-[#F3F5FC] border border-[#D2D8EC]">
+            {/* Minimal visualizer - just simple vertical burgundy bars */}
+            <div className="h-16 w-full flex items-center justify-center gap-1 mb-6 rounded-xl bg-[#FBF9F9] border border-[#EADEE0]">
               {isRecording && !isPaused ? (
                 [...Array(12)].map((_, i) => (
                   <motion.span
                     key={i}
-                    className="w-1 bg-[#8A9FE8] rounded-full"
+                    className="w-1 bg-[#800020] rounded-full"
                     animate={{ 
                       height: [12, Math.floor(Math.random() * 32) + 10, 12],
                     }}
@@ -134,18 +134,18 @@ export default function AudioRecorder({ onTranscribeComplete }: AudioRecorderPro
                   />
                 ))
               ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#D2D8EC] bg-white text-[#8A9FE8]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#EADEE0] bg-white text-[#800020]">
                   <MicIcon className="h-4 w-4" />
                 </div>
               )}
             </div>
 
             {/* Timer Display */}
-            <div className="text-2xl font-bold tracking-tight text-[#1A233D] mb-2 font-mono">
+            <div className="text-2xl font-bold tracking-tight text-[#2C1A1C] mb-2 font-mono">
               {formatTime(recordingTime)}
             </div>
             
-            <p className="text-xs text-[#505A73] mb-6">
+            <p className="text-xs text-[#5C4E50] mb-6">
               {isRecording 
                 ? isPaused ? 'Recording is paused' : 'Recording audio from browser...' 
                 : 'Click mic to record directly'
@@ -158,7 +158,7 @@ export default function AudioRecorder({ onTranscribeComplete }: AudioRecorderPro
                 <>
                   <button
                     onClick={isPaused ? resumeRecording : pauseRecording}
-                    className="text-xs text-[#505A73] hover:text-[#1A233D] bg-white hover:bg-[#F3F5FC] border border-[#D2D8EC] px-3.5 py-2 rounded-lg transition-colors cursor-pointer font-medium"
+                    className="text-xs text-[#5C4E50] hover:text-[#2C1A1C] bg-white hover:bg-[#FBF9F9] border border-[#EADEE0] px-3.5 py-2 rounded-lg transition-colors cursor-pointer font-medium"
                   >
                     {isPaused ? 'Resume' : 'Pause'}
                   </button>
@@ -174,7 +174,7 @@ export default function AudioRecorder({ onTranscribeComplete }: AudioRecorderPro
               ) : (
                 <button
                   onClick={startRecording}
-                  className="h-12 w-12 rounded-lg bg-[#8A9FE8] hover:bg-[#6B82D6] flex items-center justify-center text-white transition-colors cursor-pointer"
+                  className="h-12 w-12 rounded-lg bg-[#800020] hover:bg-[#5A1220] flex items-center justify-center text-white transition-colors cursor-pointer"
                   aria-label="Start recording"
                 >
                   <MicIcon className="h-5 w-5 text-white" />
@@ -193,29 +193,29 @@ export default function AudioRecorder({ onTranscribeComplete }: AudioRecorderPro
             exit={{ opacity: 0, scale: 0.98 }}
             className="minimal-panel p-5 text-left"
           >
-            <h4 className="text-xs font-bold text-[#1A233D] mb-3">
+            <h4 className="text-xs font-bold text-[#2C1A1C] mb-3">
               Audio Recording Ready
             </h4>
 
             {/* Custom Playback Player */}
-            <div className="flex items-center gap-3 bg-[#F3F5FC] border border-[#D2D8EC] rounded-xl p-3.5 mb-4">
+            <div className="flex items-center gap-3 bg-[#FBF9F9] border border-[#EADEE0] rounded-xl p-3.5 mb-4">
               <button
                 onClick={togglePlayback}
-                className="h-8 w-8 rounded-lg bg-white border border-[#D2D8EC] text-[#8A9FE8] hover:bg-[#E4E8F4] flex items-center justify-center transition-colors cursor-pointer"
+                className="h-8 w-8 rounded-lg bg-white border border-[#EADEE0] text-[#800020] hover:bg-[#F3EFEF] flex items-center justify-center transition-colors cursor-pointer"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 fill-current" />}
               </button>
               
               <div className="flex-1 text-xs">
-                <p className="text-[#1A233D] font-semibold">Recording Snippet</p>
-                <p className="text-[#505A73] font-mono mt-0.5">{formatTime(recordingTime)}</p>
+                <p className="text-[#2C1A1C] font-semibold">Recording Snippet</p>
+                <p className="text-[#5C4E50] font-mono mt-0.5">{formatTime(recordingTime)}</p>
               </div>
             </div>
 
             {/* Optional Input Title */}
             <div className="mb-5">
-              <label htmlFor="rec-title" className="block text-[10px] font-bold text-[#505A73] uppercase tracking-wider mb-1.5">
+              <label htmlFor="rec-title" className="block text-[10px] font-bold text-[#5C4E50] uppercase tracking-wider mb-1.5">
                 Recording Title (Optional)
               </label>
               <input
@@ -224,7 +224,7 @@ export default function AudioRecorder({ onTranscribeComplete }: AudioRecorderPro
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
                 placeholder="e.g. Brainstorming session, memo..."
-                className="w-full text-xs text-[#1A233D] bg-white border border-[#D2D8EC] focus:border-[#8A9FE8] outline-none rounded-lg px-3 py-2 transition-colors"
+                className="w-full text-xs text-[#2C1A1C] bg-white border border-[#EADEE0] focus:border-[#800020] outline-none rounded-lg px-3 py-2 transition-colors"
               />
             </div>
 
@@ -232,13 +232,13 @@ export default function AudioRecorder({ onTranscribeComplete }: AudioRecorderPro
             <div className="flex items-center gap-2">
               <button
                 onClick={clearRecording}
-                className="flex-1 text-xs text-[#505A73] hover:text-[#1A233D] bg-white hover:bg-[#F3F5FC] border border-[#D2D8EC] rounded-lg py-2 font-semibold transition-colors cursor-pointer"
+                className="flex-1 text-xs text-[#5C4E50] hover:text-[#2C1A1C] bg-white hover:bg-[#FBF9F9] border border-[#EADEE0] rounded-lg py-2 font-semibold transition-colors cursor-pointer"
               >
                 Discard
               </button>
               <button
                 onClick={handleTranscribe}
-                className="flex-1 inline-flex items-center justify-center gap-1 text-xs text-white bg-[#8A9FE8] hover:bg-[#6B82D6] rounded-lg py-2 font-bold transition-colors cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-1 text-xs text-white bg-[#800020] hover:bg-[#5A1220] rounded-lg py-2 font-bold transition-colors cursor-pointer"
               >
                 Transcribe <ArrowRight className="h-3.5 w-3.5" />
               </button>
@@ -256,20 +256,20 @@ export default function AudioRecorder({ onTranscribeComplete }: AudioRecorderPro
             className="minimal-panel p-8 text-center flex flex-col items-center justify-center min-h-[220px]"
           >
             <div className="flex h-8 w-8 items-center justify-center mb-4">
-              <RefreshCwIcon className="h-5 w-5 text-[#8A9FE8] animate-spin" />
+              <RefreshCwIcon className="h-5 w-5 text-[#800020] animate-spin" />
             </div>
 
-            <h4 className="text-xs font-semibold text-[#1A233D] mb-1">
+            <h4 className="text-xs font-semibold text-[#2C1A1C] mb-1">
               Analyzing Speech
             </h4>
             
-            <p className="text-[11px] text-[#505A73] h-4 mb-4">
+            <p className="text-[11px] text-[#5C4E50] h-4 mb-4">
               {transcribingSteps[transcribeStep]}
             </p>
 
-            <div className="w-48 h-1 bg-[#E4E8F4] rounded-full overflow-hidden border border-[#D2D8EC]/50">
+            <div className="w-48 h-1 bg-[#F3EFEF] rounded-full overflow-hidden border border-[#EADEE0]/50">
               <motion.div
-                className="h-full bg-[#8A9FE8]"
+                className="h-full bg-[#800020]"
                 initial={{ width: 0 }}
                 animate={{ width: `${((transcribeStep + 1) / transcribingSteps.length) * 100}%` }}
                 transition={{ duration: 0.5 }}
@@ -287,21 +287,21 @@ export default function AudioRecorder({ onTranscribeComplete }: AudioRecorderPro
             exit={{ opacity: 0, scale: 0.98 }}
             className="minimal-panel p-8 text-center flex flex-col items-center justify-center min-h-[220px]"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#D2D8EC] bg-[#F3F5FC] text-[#8A9FE8] mb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#EADEE0] bg-[#FBF9F9] text-[#800020] mb-4">
               <Check className="h-5 w-5" />
             </div>
 
-            <h4 className="text-xs font-bold text-[#1A233D] mb-1">
+            <h4 className="text-xs font-bold text-[#2C1A1C] mb-1">
               Voice Note Saved
             </h4>
             
-            <p className="text-[11px] text-[#505A73] mb-4 max-w-xs">
+            <p className="text-[11px] text-[#5C4E50] mb-4 max-w-xs">
               Your recording has been transcribed and added to history.
             </p>
             
             <button
               onClick={() => setSuccess(false)}
-              className="text-xs font-medium text-[#505A73] hover:text-[#1A233D] bg-[#E4E8F4] hover:bg-[#D2D8EC] border border-[#D2D8EC] rounded-lg px-4 py-2 transition-colors cursor-pointer"
+              className="text-xs font-medium text-[#5C4E50] hover:text-[#2C1A1C] bg-[#F3EFEF] hover:bg-[#EADEE0] border border-[#EADEE0] rounded-lg px-4 py-2 transition-colors cursor-pointer"
             >
               Record new voice note
             </button>
