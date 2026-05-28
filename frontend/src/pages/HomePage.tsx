@@ -33,7 +33,10 @@ export default function HomePage() {
   // Auto-scroll transcript workspace to bottom
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+      textareaRef.current.scrollTo({
+        top: textareaRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [currentText]);
 
@@ -404,17 +407,39 @@ export default function HomePage() {
                 
                 {/* Header Actions */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-border pb-4 mb-4 select-none">
-                  <div>
+                  <div className="flex flex-col gap-1">
                     <h3 className="text-xs font-bold text-stone-text-primary uppercase tracking-wider">Live Transcript Workspace</h3>
-                    <div className="flex items-center gap-3 mt-1 text-[10px] text-stone-text-secondary">
-                      <span className="flex items-center gap-1 font-semibold uppercase font-mono">
-                        Status: <span className={recordingState === 'recording' ? 'text-red-600' : 'text-stone-text-primary'}>{aiStatus}</span>
+                    <div className="flex flex-wrap items-center gap-3 mt-1 text-[10px] text-stone-text-secondary">
+                      <span className="flex items-center gap-1.5 font-semibold uppercase font-mono">
+                        Status: <span className={recordingState === 'recording' ? 'text-red-600 font-bold' : 'text-stone-text-primary'}>{aiStatus}</span>
                       </span>
+
+                      {/* Flashing Recording Indicator */}
+                      {recordingState === 'recording' && (
+                        <span className="inline-flex items-center gap-1 bg-red-600/10 border border-red-600/20 px-2 py-0.5 rounded-full text-[8px] font-bold text-red-600 tracking-wider uppercase select-none animate-pulse">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-600 animate-ping absolute" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-600" />
+                          Live
+                        </span>
+                      )}
+
+                      {/* Waveform Animation */}
+                      {recordingState === 'recording' && (
+                        <div className="flex items-end gap-[3px] h-3 px-1">
+                          <span className="w-[2px] bg-brand-primary rounded-full animate-[wave-bar_0.8s_ease-in-out_infinite]" style={{ animationDelay: '0.1s' }} />
+                          <span className="w-[2px] bg-brand-primary rounded-full animate-[wave-bar_0.8s_ease-in-out_infinite]" style={{ animationDelay: '0.3s' }} />
+                          <span className="w-[2px] bg-brand-primary rounded-full animate-[wave-bar_0.8s_ease-in-out_infinite]" style={{ animationDelay: '0.5s' }} />
+                          <span className="w-[2px] bg-brand-primary rounded-full animate-[wave-bar_0.8s_ease-in-out_infinite]" style={{ animationDelay: '0.2s' }} />
+                          <span className="w-[2px] bg-brand-primary rounded-full animate-[wave-bar_0.8s_ease-in-out_infinite]" style={{ animationDelay: '0.4s' }} />
+                        </div>
+                      )}
+
                       {accuracyMetrics.active && accuracyMetrics.pct > 0 && (
                         <>
                           <span className="w-px h-3 bg-stone-border" />
-                          <span className="flex items-center gap-1 font-mono font-semibold uppercase">
-                            Accuracy: <span className="text-brand-primary font-bold">{accuracyMetrics.pct}%</span>
+                          <span className="inline-flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 px-2.5 py-0.5 rounded-full text-[8.5px] font-bold text-green-700">
+                            <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                            Accuracy: {accuracyMetrics.pct}%
                           </span>
                         </>
                       )}
@@ -461,13 +486,13 @@ export default function HomePage() {
 
                 {/* Streaming Transcript Display Panel */}
                 <div className="flex-1 flex flex-col">
-                  {currentText ? (
+                  {currentText || recordingState === 'recording' || recordingState === 'processing' ? (
                     <div className="relative flex-grow flex flex-col">
                       <textarea
                         ref={textareaRef}
                         value={currentText}
                         onChange={(e) => setCurrentText(e.target.value)}
-                        placeholder="Speaking or uploading audio will stream transcript here..."
+                        placeholder={recordingState === 'recording' ? "Listening... Start speaking now..." : "Speaking or uploading audio will stream transcript here..."}
                         className="w-full flex-grow text-xs leading-relaxed text-stone-text-primary bg-stone-secondary/20 hover:bg-stone-secondary/40 focus:bg-stone-card border border-stone-border hover:border-brand-primary/50 focus:border-brand-primary rounded-xl p-4 min-h-[300px] outline-none transition-colors duration-200 resize-none font-sans"
                       />
                       {recordingState === 'recording' && (

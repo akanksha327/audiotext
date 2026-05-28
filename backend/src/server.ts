@@ -53,14 +53,14 @@ io.on('connection', (socket) => {
     const chunkBuffer = Buffer.from(data);
     whisperService.appendChunk(socket.id, chunkBuffer);
 
-    // Stream partial transcript live to frontend
+    // Stream live transcript live to frontend
     const text = await whisperService.getPartialTranscript(socket.id);
-    socket.emit('partial-transcript', { text });
+    socket.emit('live-transcript', { text });
   });
 
-  socket.on('stop-recording', async (metadata: { title?: string; duration?: number; fileName?: string; fileSize?: number; mimeType?: string }) => {
+  socket.on('stop-recording', async (metadata: { title?: string; duration?: number; fileName?: string; fileSize?: number; mimeType?: string; text?: string }) => {
     try {
-      const finalCompiledText = await whisperService.finalizeTranscript(socket.id);
+      const finalCompiledText = metadata.text || await whisperService.finalizeTranscript(socket.id);
       
       const duration = metadata.duration || 10;
       const title = metadata.title || `Voice Note (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;

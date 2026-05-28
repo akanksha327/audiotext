@@ -1,4 +1,4 @@
-import { execFile } from 'child_process';
+import { exec, execFile } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -52,22 +52,39 @@ export const whisperService = {
     if (binPath && modelPath && fs.existsSync(binPath)) {
       try {
         const fullBuffer = Buffer.concat(buffers);
+        const tempWebm = path.join(os.tmpdir(), `sonic-${socketId}-partial.webm`);
         const tempWav = path.join(os.tmpdir(), `sonic-${socketId}-partial.wav`);
-        fs.writeFileSync(tempWav, fullBuffer);
+        fs.writeFileSync(tempWebm, fullBuffer);
 
         return new Promise((resolve) => {
-          // Command: whisper-cli -m model.bin -f file.wav -otxt
-          execFile(binPath, ['-m', modelPath, '-f', tempWav, '--no-timestamps'], (err, stdout) => {
+          // Convert incoming webm audio chunk to 16kHz 16-bit mono wavPCM for Whisper.cpp
+          exec(`ffmpeg -y -i "${tempWebm}" -ar 16000 -ac 1 -c:a pcm_s16le "${tempWav}"`, (ffmpegErr) => {
             try {
-              if (fs.existsSync(tempWav)) fs.unlinkSync(tempWav);
+              if (fs.existsSync(tempWebm)) fs.unlinkSync(tempWebm);
             } catch (e) {}
 
-            if (err) {
-              console.warn('[WhisperService] Native partial transcription error, using mock fallback');
+            if (ffmpegErr) {
+              console.warn('[WhisperService] FFmpeg conversion failed, using mock fallback');
+              try {
+                if (fs.existsSync(tempWav)) fs.unlinkSync(tempWav);
+              } catch (e) {}
               resolve(this.getMockPartial(socketId));
-            } else {
-              resolve(stdout.trim());
+              return;
             }
+
+            // Command: whisper-cli -m model.bin -f file.wav -otxt
+            execFile(binPath, ['-m', modelPath, '-f', tempWav, '--no-timestamps'], (err, stdout) => {
+              try {
+                if (fs.existsSync(tempWav)) fs.unlinkSync(tempWav);
+              } catch (e) {}
+
+              if (err) {
+                console.warn('[WhisperService] Native partial transcription error, using mock fallback');
+                resolve(this.getMockPartial(socketId));
+              } else {
+                resolve(stdout.trim());
+              }
+            });
           });
         });
       } catch (e) {
@@ -101,7 +118,7 @@ export const whisperService = {
     const count = sessionBuffers[socketId]?.length || 0;
     
     // Return cumulative mock sentences based on time elapsed
-    const sentenceIndex = Math.floor(count / 12); 
+    const sentenceIndex = Math.floor(count / 3); 
     const list: string[] = [];
     
     for (let i = 0; i <= Math.min(sentenceIndex, mockSentences.length - 1); i++) {
@@ -110,7 +127,7 @@ export const whisperService = {
     
     // Add interim final characters to simulate typing action
     const currentSentence = mockSentences[Math.min(sentenceIndex + 1, mockSentences.length - 1)];
-    const wordPct = (count % 12) / 12;
+    const wordPct = (count % 3) / 3;
     const words = currentSentence.split(' ');
     const visibleWords = words.slice(0, Math.ceil(words.length * wordPct)).join(' ');
     

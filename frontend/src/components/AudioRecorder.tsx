@@ -49,6 +49,10 @@ export default function AudioRecorder({
   const timerRef = useRef<number | null>(null);
   const audioSnippetRef = useRef<HTMLAudioElement | null>(null);
 
+  // SpeechRecognition references
+  const recognitionRef = useRef<any>(null);
+  const actualTextRef = useRef<string>('');
+
   // Clean socket and streams
   useEffect(() => {
     return () => {
@@ -82,6 +86,13 @@ export default function AudioRecorder({
       audioContextRef.current.close().catch(() => {});
       audioContextRef.current = null;
     }
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onend = null;
+        recognitionRef.current.stop();
+      } catch (e) {}
+      recognitionRef.current = null;
+    }
   };
 
   // HTML5 voice synthesis confirmation
@@ -103,6 +114,7 @@ export default function AudioRecorder({
     setAccuracy(null);
     audioChunksRef.current = [];
     onTextStream('');
+    actualTextRef.current = '';
     setRecordingTime(0);
 
     try {
@@ -123,8 +135,8 @@ export default function AudioRecorder({
         socket.emit('start-recording');
       });
 
-      // Listen for partial real-time streaming transcripts
-      socket.on('partial-transcript', (data: { text: string }) => {
+      // Listen for live real-time streaming transcripts from backend Whisper.cpp
+      socket.on('live-transcript', (data: { text: string }) => {
         onTextStream(data.text);
       });
 
@@ -165,7 +177,7 @@ export default function AudioRecorder({
         socket.disconnect();
       });
 
-      // 2. Initialize MediaRecorder to slice audio chunks every 250ms
+      // 2. Initialize MediaRecorder to slice audio chunks every 1000ms (1 second)
       const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       mediaRecorderRef.current = recorder;
 
@@ -200,7 +212,7 @@ export default function AudioRecorder({
       startCanvasLoop(analyser);
 
       // 4. Start recording and triggers
-      recorder.start(250); // Emit chunk every 250ms
+      recorder.start(1000); // Emit chunk every 1000ms (1 second)
       setIsRecording(true);
       setIsPaused(false);
       onStateChange('recording');
@@ -233,9 +245,9 @@ export default function AudioRecorder({
       animationFrameRef.current = requestAnimationFrame(draw);
       analyserNode.getByteFrequencyData(dataArray);
 
-      // Color scheme: stone accent (#78716C) & borders (#D6D3D1)
+      // Color scheme: burgundy accent (#800020) & borders (#D6D3D1)
       const isDark = document.documentElement.classList.contains('dark');
-      const accentColor = isDark ? '#A8A29E' : '#78716C';
+      const accentColor = isDark ? '#D64561' : '#800020';
       const borderTheme = isDark ? '#44403C' : '#D6D3D1';
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -265,6 +277,7 @@ export default function AudioRecorder({
       mediaRecorderRef.current.pause();
       setIsPaused(true);
       onStatusChange('Recording Paused');
+      
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -277,6 +290,7 @@ export default function AudioRecorder({
       mediaRecorderRef.current.resume();
       setIsPaused(false);
       onStatusChange('Listening...');
+      
       timerRef.current = window.setInterval(() => {
         setRecordingTime((prev) => prev + 1);
       }, 1000);

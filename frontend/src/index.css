@@ -25,8 +25,8 @@
 }
 
 :root {
-  --brand-primary: #78716C;
-  --brand-primary-hover: #57534E;
+  --brand-primary: #800020;
+  --brand-primary-hover: #5F0018;
   
   --stone-bg: #F5F5F4;
   --stone-secondary: #E7E5E4;
@@ -37,8 +37,8 @@
 }
 
 html.dark {
-  --brand-primary: #A8A29E;
-  --brand-primary-hover: #D6D3D1;
+  --brand-primary: #D64561;
+  --brand-primary-hover: #E6677F;
   
   --stone-bg: #1C1917;
   --stone-secondary: #292524;
@@ -94,4 +94,16 @@ html, body, .minimal-panel, button, input, textarea, select, a, span, p, h1, h2,
   color: var(--stone-text-primary);
   font-weight: 600;
   border-bottom: 2px solid var(--brand-primary);
+}
+
+/* Custom Waveform Animation */
+@keyframes wave-bar {
+  0%, 100% {
+    height: 4px;
+    opacity: 0.5;
+  }
+  50% {
+    height: 14px;
+    opacity: 1;
+  }
 }
