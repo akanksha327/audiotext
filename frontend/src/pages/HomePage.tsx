@@ -137,7 +137,7 @@ export default function HomePage() {
       setSelectedTranscript(saved);
       setTranscript(finalCompiledText);
       setRecordingState('completed');
-      setAiStatus('Analysis Completed');
+      setAiStatus('Transcription Ready');
       setAccuracyMetrics({
         pct: saved.accuracy || finalAcc,
         clarity: 'Excellent',
@@ -190,7 +190,7 @@ export default function HomePage() {
     const url = URL.createObjectURL(textBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${(selectedTranscript?.title || 'SonicScript-export').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.txt`;
+    link.download = `${(selectedTranscript?.title || 'voxnote-export').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -199,7 +199,7 @@ export default function HomePage() {
 
   const handleDownloadPdf = () => {
     // Generate clean print view export
-    const title = selectedTranscript?.title || 'SonicScript AI Transcript';
+    const title = selectedTranscript?.title || 'VoxNote Transcript';
     const date = selectedTranscript?.createdAt ? new Date(selectedTranscript.createdAt).toLocaleDateString() : new Date().toLocaleDateString();
     const duration = selectedTranscript ? `${Math.floor(selectedTranscript.duration / 60)}m ${selectedTranscript.duration % 60}s` : 'N/A';
     
@@ -225,12 +225,12 @@ export default function HomePage() {
             <div class="meta">
               <span><strong>Date:</strong> ${date}</span>
               <span><strong>Duration:</strong> ${duration}</span>
-              <span><strong>Generated via:</strong> SonicScript AI</span>
+              <span><strong>Generated via:</strong> VoxNote</span>
             </div>
           </div>
           <div class="content">${transcript}</div>
           <div class="footer">
-            © ${new Date().getFullYear()} SonicScript Inc. - Premium Speech Recognition
+            © ${new Date().getFullYear()} VoxNote - Real-Time Voice Transcription
           </div>
         </body>
       </html>
@@ -332,7 +332,7 @@ export default function HomePage() {
                 {/* Header Switcher */}
                 <div className="flex items-center justify-between border-b border-stone-border pb-4 mb-6 select-none">
                   <h3 className="text-xs font-bold text-stone-text-primary flex items-center gap-2">
-                    Audio Capture
+                    Voice Recorder
                   </h3>
                   <div className="flex items-center bg-stone-secondary border border-stone-border rounded-lg p-0.5">
                     <button
@@ -353,7 +353,7 @@ export default function HomePage() {
                           : 'text-stone-text-secondary hover:text-stone-text-primary'
                       }`}
                     >
-                      <Upload className="h-3 w-3" /> Upload
+                      <Upload className="h-3 w-3" /> Upload Audio
                     </button>
                   </div>
                 </div>
@@ -385,7 +385,7 @@ export default function HomePage() {
                       exit={{ opacity: 0, y: 10 }}
                       className="mt-6 border-t border-stone-border pt-4 flex flex-col gap-3 text-left"
                     >
-                      <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider">Floating Accuracy Hub</span>
+                      <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider">Recording Details</span>
                       <div className="grid grid-cols-2 gap-2 select-none">
                         
                         <div className="bg-stone-secondary border border-stone-border rounded-lg p-2.5 flex flex-col">
@@ -425,7 +425,7 @@ export default function HomePage() {
                 {/* Header Actions */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-border pb-4 mb-4 select-none">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xs font-bold text-stone-text-primary uppercase tracking-wider">Live Transcript Workspace</h3>
+                    <h3 className="text-xs font-bold text-stone-text-primary uppercase tracking-wider">Live Transcript</h3>
                     <div className="flex flex-wrap items-center gap-3 mt-1 text-[10px] text-stone-text-secondary">
                       <span className="flex items-center gap-1.5 font-semibold uppercase font-mono">
                         Status: <span className={recordingState === 'recording' ? 'text-red-600 font-bold' : 'text-stone-text-primary'}>{aiStatus}</span>
@@ -523,8 +523,7 @@ export default function HomePage() {
                   ) : (
                     <div className="flex-grow flex flex-col items-center justify-center text-stone-text-secondary py-20 border border-dashed border-stone-border rounded-xl select-none bg-stone-secondary/10">
                       <FileText className="h-8 w-8 text-stone-text-secondary/50 mb-2" />
-                      <p className="text-xs font-semibold">Workspace is currently empty</p>
-                      <p className="text-[10px] text-stone-text-secondary/70 mt-1 max-w-[240px] text-center leading-relaxed">Activate microphone or drop audio files to compile transcripts.</p>
+                      <p className="text-xs font-semibold">Start recording to see your transcript here.</p>
                     </div>
                   )}
                 </div>

@@ -136,7 +136,7 @@ export default function LandingPage() {
       setSelectedTranscript(saved);
       setTranscript(finalCompiledText);
       setRecordingState('completed');
-      setAiStatus('Analysis Completed');
+      setAiStatus('Transcription Ready');
       setAccuracyMetrics({
         pct: saved.accuracy || finalAcc,
         clarity: 'Excellent',
@@ -189,7 +189,7 @@ export default function LandingPage() {
     const url = URL.createObjectURL(textBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${(selectedTranscript?.title || 'SonicScript-export').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.txt`;
+    link.download = `${(selectedTranscript?.title || 'voxnote-export').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -197,7 +197,7 @@ export default function LandingPage() {
   };
 
   const handleDownloadPdf = () => {
-    const title = selectedTranscript?.title || 'SonicScript AI Transcript';
+    const title = selectedTranscript?.title || 'VoxNote Transcript';
     const date = selectedTranscript?.createdAt ? new Date(selectedTranscript.createdAt).toLocaleDateString() : new Date().toLocaleDateString();
     const duration = selectedTranscript ? `${Math.floor(selectedTranscript.duration / 60)}m ${selectedTranscript.duration % 60}s` : 'N/A';
     
@@ -223,12 +223,12 @@ export default function LandingPage() {
             <div class="meta">
               <span><strong>Date:</strong> ${date}</span>
               <span><strong>Duration:</strong> ${duration}</span>
-              <span><strong>Generated via:</strong> SonicScript</span>
+              <span><strong>Generated via:</strong> VoxNote</span>
             </div>
           </div>
           <div class="content">${transcript}</div>
           <div class="footer">
-            © ${new Date().getFullYear()} SonicScript - Modern AI Speech to Text
+            © ${new Date().getFullYear()} VoxNote - Real-Time Voice Transcription
           </div>
         </body>
       </html>
@@ -290,16 +290,16 @@ export default function LandingPage() {
             className="flex flex-col items-center"
           >
             <span className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-[10px] font-semibold bg-stone-secondary border border-stone-border text-stone-text-muted mb-6 uppercase tracking-wider">
-              High-Fidelity Speech Engine
+              Real-Time Voice Transcription
             </span>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-stone-text-primary leading-[1.12] mb-6">
-              Turn Speech Into <br />
-              <span className="text-stone-text-muted">Perfect Text Instantly</span>
+              Your Voice, <br />
+              <span className="text-stone-text-muted">Captured in Real Time</span>
             </h1>
 
             <p className="text-xs sm:text-sm md:text-base text-stone-text-secondary max-w-xl leading-relaxed mb-8">
-              SonicScript uses advanced low-latency speech pipelines to transcribe microphone audio and file uploads in real time. Minimal, secure, and fast.
+              Record your voice, convert it into text instantly, and keep everything organized in one place.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
@@ -336,7 +336,7 @@ export default function LandingPage() {
                 {/* Header Selector Tabs */}
                 <div className="flex items-center justify-between border-b border-stone-border pb-4 mb-6 select-none">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-stone-text-primary flex items-center gap-1.5">
-                    Audio Capture
+                    Voice Recorder
                   </h3>
                   <div className="flex items-center bg-stone-secondary border border-stone-border rounded-lg p-0.5">
                     <button
@@ -357,7 +357,7 @@ export default function LandingPage() {
                           : 'text-stone-text-secondary hover:text-stone-text-primary'
                       }`}
                     >
-                      <Upload className="h-3 w-3" /> Upload
+                      <Upload className="h-3 w-3" /> Upload Audio
                     </button>
                   </div>
                 </div>
@@ -388,7 +388,7 @@ export default function LandingPage() {
                       exit={{ opacity: 0, y: 5 }}
                       className="mt-6 border-t border-stone-border pt-4 flex flex-col gap-3 text-left"
                     >
-                      <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider">Acoustic Signal Hub</span>
+                      <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider">Recording Details</span>
                       <div className="grid grid-cols-2 gap-2 select-none">
                         <div className="bg-stone-secondary border border-stone-border rounded-lg p-2.5 flex flex-col">
                           <span className="text-[8px] uppercase tracking-wider text-stone-text-secondary">Speech Accuracy</span>
@@ -423,7 +423,7 @@ export default function LandingPage() {
                 {/* Panel Actions Bar */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-border pb-4 mb-4 select-none">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-xs font-bold text-stone-text-primary uppercase tracking-wider">Live Transcript Workspace</h3>
+                    <h3 className="text-xs font-bold text-stone-text-primary uppercase tracking-wider">Live Transcript</h3>
                     <div className="flex flex-wrap items-center gap-3 mt-1 text-[10px] text-stone-text-secondary">
                       <span className="flex items-center gap-1 font-mono uppercase">
                         Status: <span className={recordingState === 'recording' ? 'text-brand-primary font-bold' : 'text-stone-text-primary'}>{aiStatus}</span>
@@ -506,10 +506,7 @@ export default function LandingPage() {
                   ) : (
                     <div className="flex-grow flex flex-col items-center justify-center text-stone-text-secondary py-20 border border-dashed border-stone-border rounded-xl select-none bg-stone-secondary/10">
                       <FileText className="h-8 w-8 text-stone-text-muted/40 mb-2" />
-                      <p className="text-xs font-semibold">Workspace is currently empty</p>
-                      <p className="text-[10px] text-stone-text-secondary/70 mt-1 max-w-[240px] text-center leading-relaxed">
-                        Start recording on the left or drop an audio file to compile transcripts.
-                      </p>
+                      <p className="text-xs font-semibold">Start recording to see your transcript here.</p>
                     </div>
                   )}
                 </div>
@@ -524,7 +521,7 @@ export default function LandingPage() {
         <section id="history-list" className="py-12 border-t border-stone-border scroll-mt-20">
           <div className="text-left mb-6">
             <h2 className="text-lg font-bold text-stone-text-primary flex items-center gap-2">
-              <ListFilter className="h-4.5 w-4.5 text-brand-primary" /> Transcription History Catalog
+              <ListFilter className="h-4.5 w-4.5 text-brand-primary" /> Recording History
             </h2>
             <p className="text-xs text-stone-text-secondary mt-0.5">
               Browse previous records, search text segments, rename notes, and re-export compiled transcripts.

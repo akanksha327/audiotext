@@ -199,12 +199,12 @@ io.on('connection', (socket) => {
       const finalCompiledText = dgTranscripts[socket.id]?.trim() || " ";
       
       const duration = metadata.duration || 10;
-      const title = metadata.title || `Voice Note (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+      const title = metadata.title || `Recording (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
       const fileSize = metadata.fileSize || Math.floor(duration * 16000); 
       const accuracy = Math.floor(Math.random() * 4) + 96; // 96-99% accuracy for Deepgram
 
       // Locate default seeded user
-      const defaultUser = await User.findOne({ email: 'user@sonicscript.ai' });
+      const defaultUser = await User.findOne({ email: 'user@voxnote.ai' });
       const userId = defaultUser ? defaultUser._id : undefined;
 
       const newTranscript = await Transcript.create({
@@ -214,7 +214,7 @@ io.on('connection', (socket) => {
         status: 'completed',
         language: 'en',
         user: userId,
-        fileName: metadata.fileName || 'VoiceNote.webm',
+        fileName: metadata.fileName || 'Recording.webm',
         fileSize,
         mimeType: metadata.mimeType || 'audio/webm',
         accuracy
@@ -265,11 +265,11 @@ io.on('connection', (socket) => {
 // Test Connection / Root Route
 app.get('/', (req: Request, res: Response) => {
   return ApiResponse.success(res, {
-    app: 'SonicScript API',
+    app: 'VoxNote API',
     status: 'Healthy',
     version: '1.0.0',
     time: new Date()
-  }, 'SonicScript Server running successfully');
+  }, 'VoxNote Server running successfully');
 });
 
 // App Router Integration
@@ -287,7 +287,7 @@ app.use(errorHandler);
 // Listen on HTTP server (wrapping Socket.IO and Express app)
 httpServer.listen(PORT, () => {
   console.log(`========================================`);
-  console.log(` SonicScript Server running in ${process.env.NODE_ENV} mode`);
+  console.log(` VoxNote Server running in ${process.env.NODE_ENV} mode`);
   console.log(` Local: http://localhost:${PORT}`);
   console.log(`========================================`);
 });

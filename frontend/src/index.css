@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* SonicScript Color Palette - Minimal Stone Theme */
+  /* VoxNote Color Palette - Minimal Stone Theme */
   --color-brand-primary: var(--brand-primary);
   --color-brand-primary-hover: var(--brand-primary-hover);
   --color-brand-accent: var(--brand-accent);
@@ -18,23 +18,40 @@
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
+/* Default Theme: Dark Mode */
 :root {
-  /* Modern Minimalist Refined Reddish-Brown Color Palette */
-  --brand-primary: #A44A3F; /* Accent Color: Reddish-Brown */
-  --brand-primary-hover: #C26A5A; /* Darker accent for hover */
+  /* Modern Minimalist Refined Reddish-Brown Color Palette - Dark Mode */
+  --brand-primary: #C26A5A;
+  --brand-primary-hover: #D17C6B;
   --brand-accent: #C26A5A;
   --brand-accent-hover: #D17C6B;
   
-  --stone-bg: #F5F5F4; /* Main background */
-  --stone-secondary: #E7E5E4; /* Secondary background */
-  --stone-card: #FFFFFF; /* White cards */
-  --stone-text-primary: #1C1917; /* Primary text */
-  --stone-text-secondary: #57534E; /* Secondary text */
-  --stone-text-muted: #8A746C; /* Muted text (with reddish-brown hint) */
-  --stone-border: #D6D3D1; /* Thin border color */
+  --stone-bg: #1A1412;
+  --stone-secondary: #241B18;
+  --stone-card: #241B18;
+  --stone-text-primary: #F5EDE8;
+  --stone-text-secondary: #A69690;
+  --stone-text-muted: #8A746C;
+  --stone-border: #4B342F;
 }
 
-/* Force light theme always to align with user's specific theme request */
+/* Light Theme overrides */
+html.light {
+  /* Modern Minimalist Refined Reddish-Brown Color Palette - Light Mode */
+  --brand-primary: #A44A3F;
+  --brand-primary-hover: #C26A5A;
+  --brand-accent: #A44A3F;
+  --brand-accent-hover: #C26A5A;
+  
+  --stone-bg: #F8F6F4;
+  --stone-secondary: #DDD6D3;
+  --stone-card: #FFFFFF;
+  --stone-text-primary: #1C1917;
+  --stone-text-secondary: #57534E;
+  --stone-text-muted: #8A746C;
+  --stone-border: #DDD6D3;
+}
+
 html, body {
   background-color: var(--stone-bg);
   color: var(--stone-text-primary);

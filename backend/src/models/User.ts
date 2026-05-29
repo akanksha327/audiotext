@@ -22,13 +22,13 @@ const UserSchema = new Schema<IUser>(
       type: String,
       required: true,
       unique: true,
-      default: 'user@sonicscript.ai',
+      default: 'user@voxnote.ai',
       trim: true,
       lowercase: true,
     },
     avatar: {
       type: String,
-      default: 'SS',
+      default: 'VN',
     },
     accountType: {
       type: String,

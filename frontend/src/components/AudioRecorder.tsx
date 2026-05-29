@@ -141,7 +141,7 @@ export default function AudioRecorder({
     let recognition: any = null;
 
     try {
-      const selectedMicId = localStorage.getItem('sonic_mic') || 'default';
+      const selectedMicId = localStorage.getItem('voxnote_mic') || 'default';
       const constraints = {
         audio: {
           deviceId: selectedMicId === 'default' ? undefined : { exact: selectedMicId },
@@ -163,7 +163,7 @@ export default function AudioRecorder({
         console.log('socket connected');
         console.log('Socket connected');
         socket.emit('start-recording');
-        onStatusChange('Live Transcript Active');
+        onStatusChange('Listening...');
       });
 
       // Listen for live real-time streaming transcripts from backend
@@ -221,7 +221,7 @@ export default function AudioRecorder({
         recognition.continuous = true;
         recognition.interimResults = true;
         
-        const storedLang = localStorage.getItem('sonic_lang') || 'en';
+        const storedLang = localStorage.getItem('voxnote_lang') || 'en';
         recognition.lang = getDialectCode(storedLang);
 
         recognition.onresult = (event: any) => {
@@ -436,9 +436,9 @@ export default function AudioRecorder({
         const totalSize = audioChunksRef.current.reduce((sum, chunk) => sum + chunk.size, 0);
         
         socketRef.current.emit('stop-recording', {
-          title: `Voice Note (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
+          title: `Recording (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
           duration: recordingTime,
-          fileName: 'VoiceNote.webm',
+          fileName: 'Recording.webm',
           fileSize: totalSize,
           mimeType: 'audio/webm'
         });
@@ -451,7 +451,7 @@ export default function AudioRecorder({
   };
 
   const handleDiscard = () => {
-    if (confirm('Discard current recording?')) {
+    if (confirm('Delete current recording?')) {
       cleanupStreams();
       setAudioUrl(null);
       setIsRecording(false);
@@ -538,7 +538,7 @@ export default function AudioRecorder({
             </div>
 
             {/* Timer Counter */}
-            <div className="text-4xl font-extrabold tracking-tight text-white mb-1 font-mono select-none">
+            <div className="text-4xl font-extrabold tracking-tight text-stone-text-primary mb-1 font-mono select-none">
               {formatTime(recordingTime)}
             </div>
             
@@ -566,7 +566,7 @@ export default function AudioRecorder({
               <div className="flex items-center justify-center gap-3 mt-4">
                 <button
                   onClick={isPaused ? resumeRecording : pauseRecording}
-                  className="h-10 px-4 rounded-xl bg-stone-secondary hover:bg-stone-card border border-stone-border text-xs font-semibold text-stone-text-secondary hover:text-white flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+                  className="h-10 px-4 rounded-xl bg-stone-secondary hover:bg-stone-card border border-stone-border text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary flex items-center gap-2 transition-all cursor-pointer shadow-sm"
                   title={isPaused ? 'Resume' : 'Pause'}
                 >
                   {isPaused ? <Play className="h-3.5 w-3.5 fill-current" /> : <Pause className="h-3.5 w-3.5" />}
@@ -603,14 +603,14 @@ export default function AudioRecorder({
             <div className="flex items-center gap-3 bg-stone-secondary border border-stone-border rounded-2xl p-4 mb-4 select-none shadow-md">
               <button
                 onClick={togglePlayback}
-                className="h-10 w-10 rounded-xl bg-stone-card border border-stone-border text-brand-primary hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="h-10 w-10 rounded-xl bg-stone-card border border-stone-border text-brand-primary hover:bg-brand-primary hover:text-white hover:border-brand-primary flex items-center justify-center transition-all cursor-pointer"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
               </button>
               
-              <div className="flex-1 text-xs">
-                <p className="text-white font-bold">Voice Recording Note</p>
+              <div className="flex-grow text-xs">
+                <p className="text-stone-text-primary font-bold">Recording</p>
                 <p className="text-stone-text-secondary font-mono mt-0.5">{formatTime(recordingTime)}</p>
               </div>
             </div>
@@ -631,13 +631,13 @@ export default function AudioRecorder({
                 onClick={handleDiscard}
                 className="flex-1 flex items-center justify-center gap-1.5 text-xs text-stone-text-secondary hover:text-red-500 bg-stone-card hover:bg-red-950/10 border border-stone-border hover:border-red-900/30 rounded-xl py-3 font-semibold transition-all cursor-pointer"
               >
-                <Trash2 className="h-4 w-4" /> Discard
+                <Trash2 className="h-4 w-4" /> Delete
               </button>
               <button
                 onClick={startRecording}
                 className="flex-1 flex items-center justify-center gap-1.5 text-xs text-white bg-brand-primary hover:bg-brand-primary-hover rounded-xl py-3 font-semibold transition-all cursor-pointer shadow-lg shadow-brand-primary/10"
               >
-                Record New <ArrowRight className="h-4 w-4" />
+                New Recording <ArrowRight className="h-4 w-4" />
               </button>
             </div>
 

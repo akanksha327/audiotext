@@ -224,7 +224,7 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
                 onClick={removeFile}
                 className="flex-1 sm:flex-none text-xs text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-bg border border-stone-border rounded-lg px-3.5 py-2 font-medium transition-colors cursor-pointer"
               >
-                Discard
+                Delete
               </button>
               <button
                 onClick={processAudio}

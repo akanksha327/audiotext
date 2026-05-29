@@ -8,7 +8,7 @@ const sessionBuffers: Record<string, Buffer[]> = {};
 const sessionSpeechIndex: Record<string, number> = {};
 
 const mockSentences = [
-  "Hello and welcome to SonicScript.",
+  "Hello and welcome to VoxNote.",
   "We are streaming audio chunks continuously from the frontend client to the Express Node server.",
   "The backend processes these audio fragments using a Whisper speech recognition engine.",
   "In this premium sandbox environment, Mongoose database models index and store every transcript.",
@@ -108,7 +108,7 @@ export const whisperService = {
     delete sessionSpeechIndex[socketId];
     
     console.log(`[WhisperService] Finalized session for socket: ${socketId}`);
-    return fullText || "SonicScript completed recording successfully.";
+    return fullText || "VoxNote completed recording successfully.";
   },
 
   /**

@@ -10,7 +10,7 @@ const demoTranscripts = [
     _id: 'demo-1',
     title: 'Project Kickoff Meeting',
     duration: 72,
-    text: 'Welcome everyone to the SonicScript kickoff meeting. Today we are launching our new AI speech-to-text SaaS foundation. We will focus on extreme visual premium feel, responsive panels, high accessibility, and instant downloads. The goal is to provide human-crafted layouts with zero template clutter.',
+    text: 'Welcome everyone to the VoxNote kickoff meeting. Today we are launching our new AI speech-to-text SaaS foundation. We will focus on extreme visual premium feel, responsive panels, high accessibility, and instant downloads. The goal is to provide human-crafted layouts with zero template clutter.',
     status: 'completed',
     language: 'en',
     createdAt: new Date(Date.now() - 3600000 * 2), // 2 hours ago
@@ -32,7 +32,7 @@ const mockSentences = [
   "Integrating speech recognition APIs directly in the client gives users real-time transcription access.",
   "We are leveraging standard Web Audio API pipelines inside modern browsers to record high-fidelity voice snippets.",
   "By storing transcripts on a MongoDB cluster, we can track and index documents with search utilities efficiently.",
-  "SonicScript leverages advanced neural networks to separate acoustics and output human-readable, punctuated transcripts.",
+  "VoxNote leverages advanced neural networks to separate acoustics and output human-readable, punctuated transcripts.",
   "This foundation uses clean React states, custom hooks, and Tailwind CSS v4 styles to build a premium developer workspace."
 ];
 
@@ -86,7 +86,7 @@ export const createTranscript = async (req: Request, res: Response, next: NextFu
     let newTranscript: any;
     try {
       // Find default seeded user
-      const defaultUser = await User.findOne({ email: 'user@sonicscript.ai' });
+      const defaultUser = await User.findOne({ email: 'user@voxnote.ai' });
       const userId = defaultUser ? defaultUser._id : undefined;
 
       newTranscript = await Transcript.create({
@@ -186,7 +186,7 @@ export const deleteTranscript = async (req: Request, res: Response, next: NextFu
         await Transcript.findByIdAndDelete(id);
 
         // Decrement user storageUsed
-        const defaultUser = await User.findOne({ email: 'user@sonicscript.ai' });
+        const defaultUser = await User.findOne({ email: 'user@voxnote.ai' });
         if (defaultUser && defaultUser.storageUsed >= deletedSize) {
           defaultUser.storageUsed -= deletedSize;
           await defaultUser.save();
@@ -246,11 +246,11 @@ export const uploadAudioTranscript = async (req: Request, res: Response, next: N
       }
     } else {
       console.warn('[Deepgram File STT] API key missing, using simulated text.');
-      transcribedText = "Welcome to SonicScript transcription portal. This is a simulated fallback text since the Deepgram API key is not configured in your env file.";
+      transcribedText = "Welcome to VoxNote transcription portal. This is a simulated fallback text since the Deepgram API key is not configured in your env file.";
     }
 
     // Find default seeded user
-    const defaultUser = await User.findOne({ email: 'user@sonicscript.ai' });
+    const defaultUser = await User.findOne({ email: 'user@voxnote.ai' });
     const userId = defaultUser ? defaultUser._id : undefined;
 
     const newTranscript = await Transcript.create({
@@ -318,10 +318,10 @@ export const uploadAudioFileTranscript = async (req: Request, res: Response, nex
       }
     } else {
       console.warn('[Deepgram File STT] API key missing, using simulated text.');
-      transcribedText = "Welcome to SonicScript transcription portal. This is a simulated fallback text since the Deepgram API key is not configured in your env file.";
+      transcribedText = "Welcome to VoxNote transcription portal. This is a simulated fallback text since the Deepgram API key is not configured in your env file.";
     }
 
-    const defaultUser = await User.findOne({ email: 'user@sonicscript.ai' });
+    const defaultUser = await User.findOne({ email: 'user@voxnote.ai' });
     const userId = defaultUser ? defaultUser._id : undefined;
 
     const newTranscript = await Transcript.create({

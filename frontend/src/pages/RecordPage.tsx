@@ -55,7 +55,7 @@ export default function RecordPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `sonicscript-transcript-${Date.now()}.txt`;
+    link.download = `voxnote-transcript-${Date.now()}.txt`;
     link.click();
     URL.revokeObjectURL(url);
     showToast('Transcript exported as TXT', 'success');
@@ -67,7 +67,7 @@ export default function RecordPage() {
     printWindow.document.write(`
       <html>
         <head>
-          <title>SonicScript AI Transcript</title>
+          <title>VoxNote Transcript</title>
           <style>
             body { font-family: sans-serif; padding: 40px; color: #18181b; line-height: 1.6; }
             .header { border-bottom: 2px solid #8b5cf6; padding-bottom: 12px; margin-bottom: 24px; }
@@ -77,7 +77,7 @@ export default function RecordPage() {
         </head>
         <body>
           <div class="header">
-            <h1>SonicScript AI Speech Transcript</h1>
+            <h1>VoxNote Speech Transcript</h1>
             <p style="font-size: 11px; color: #71717a; margin: 0;">Compiled via Web Speech Engine</p>
           </div>
           <div class="content">${transcript}</div>
@@ -110,7 +110,7 @@ export default function RecordPage() {
           
           <div>
             <h3 className="text-[10px] font-bold text-stone-text-muted flex items-center gap-2 mb-8 uppercase tracking-widest">
-              Audio Capture Core
+              Voice Recorder
             </h3>
 
             <div className="flex items-center justify-center py-6">
@@ -159,7 +159,7 @@ export default function RecordPage() {
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-border/50 pb-4 mb-5">
             <div className="flex flex-col gap-1">
-              <h3 className="text-[10px] font-bold text-stone-text-muted uppercase tracking-widest">Live Transcript Workspace</h3>
+              <h3 className="text-[10px] font-bold text-stone-text-muted uppercase tracking-widest">Live Transcript</h3>
               
               <div className="flex flex-wrap items-center gap-3 mt-1.5 text-[9px] text-stone-text-muted font-bold tracking-widest">
                 <span>

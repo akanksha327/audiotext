@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
 import { 
-  Settings, Sun, Moon, Laptop, Globe, Mic, 
+  Settings, Sun, Moon, Globe, Mic, 
   HelpCircle
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 
 export default function SettingsPage() {
   const { showToast } = useToast();
+  const { theme, setTheme } = useTheme();
 
-  const [lang, setLang] = useState(() => localStorage.getItem('sonic_lang') || 'en');
-  const [quality, setQuality] = useState(() => localStorage.getItem('sonic_quality') || 'high');
-  const [selectedMic, setSelectedMic] = useState(() => localStorage.getItem('sonic_mic') || 'default');
+  const [lang, setLang] = useState(() => localStorage.getItem('voxnote_lang') || 'en');
+  const [quality, setQuality] = useState(() => localStorage.getItem('voxnote_quality') || 'high');
+  const [selectedMic, setSelectedMic] = useState(() => localStorage.getItem('voxnote_mic') || 'default');
   const [mics, setMics] = useState<MediaDeviceInfo[]>([]);
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(
-    () => (localStorage.getItem('theme') as 'light' | 'dark' | 'system') || 'dark'
-  );
 
   // Enumerate input devices
   useEffect(() => {
@@ -29,47 +28,28 @@ export default function SettingsPage() {
   }, []);
 
   // Update theme setting
-  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
+  const handleThemeChange = (newTheme: 'light' | 'dark') => {
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    
-    const root = document.documentElement;
-    const applyTheme = (isDark: boolean) => {
-      if (isDark) {
-        root.classList.add('dark');
-        root.classList.remove('light');
-      } else {
-        root.classList.add('light');
-        root.classList.remove('dark');
-      }
-    };
-
-    if (newTheme === 'system') {
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      applyTheme(systemDark);
-    } else {
-      applyTheme(newTheme === 'dark');
-    }
     showToast(`Theme updated to ${newTheme} mode`, 'success');
   };
 
   const handleLangChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setLang(val);
-    localStorage.setItem('sonic_lang', val);
+    localStorage.setItem('voxnote_lang', val);
     showToast(`Language updated successfully`, 'success');
   };
 
   const handleMicChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setSelectedMic(val);
-    localStorage.setItem('sonic_mic', val);
+    localStorage.setItem('voxnote_mic', val);
     showToast(`Input microphone updated`, 'success');
   };
 
   const handleQualityChange = (q: string) => {
     setQuality(q);
-    localStorage.setItem('sonic_quality', q);
+    localStorage.setItem('voxnote_quality', q);
     showToast(`Transcription quality updated to ${q}`, 'success');
   };
 
@@ -93,9 +73,9 @@ export default function SettingsPage() {
 
         {/* 1. Theme Selection */}
         <div className="space-y-2">
-          <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-widest block">Theme Mode</span>
-          <div className="grid grid-cols-3 gap-1 bg-stone-secondary border border-stone-border rounded-lg p-0.5 max-w-sm select-none">
-            {(['light', 'dark', 'system'] as const).map((t) => (
+          <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-widest block">Appearance</span>
+          <div className="grid grid-cols-2 gap-1 bg-stone-secondary border border-stone-border rounded-lg p-0.5 max-w-sm select-none">
+            {(['light', 'dark'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => handleThemeChange(t)}
@@ -107,8 +87,7 @@ export default function SettingsPage() {
               >
                 {t === 'light' && <Sun className="h-3.5 w-3.5" />}
                 {t === 'dark' && <Moon className="h-3.5 w-3.5" />}
-                {t === 'system' && <Laptop className="h-3.5 w-3.5" />}
-                {t}
+                {t === 'light' ? 'Light Mode' : 'Dark Mode'}
               </button>
             ))}
           </div>

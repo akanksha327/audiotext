@@ -56,7 +56,7 @@ export default function UploadPage() {
     printWindow.document.write(`
       <html>
         <head>
-          <title>SonicScript AI Transcript</title>
+          <title>VoxNote Transcript</title>
           <style>
             body { font-family: sans-serif; padding: 40px; color: #18181b; line-height: 1.6; }
             .header { border-bottom: 2px solid #8b5cf6; padding-bottom: 12px; margin-bottom: 24px; }
@@ -66,7 +66,7 @@ export default function UploadPage() {
         </head>
         <body>
           <div class="header">
-            <h1>SonicScript AI File Transcript</h1>
+            <h1>VoxNote File Transcript</h1>
             <p style="font-size: 11px; color: #71717a; margin: 0;">Compiled via Deepgram File Pipeline</p>
           </div>
           <div class="content">${transcript}</div>
@@ -117,7 +117,7 @@ export default function UploadPage() {
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-border/50 pb-4 mb-5">
             <div className="flex flex-col gap-1">
-              <h3 className="text-[10px] font-bold text-stone-text-muted uppercase tracking-widest">File Transcription Workspace</h3>
+              <h3 className="text-[10px] font-bold text-stone-text-muted uppercase tracking-widest">File Transcription</h3>
               <p className="text-[9px] text-stone-text-muted tracking-widest font-bold uppercase mt-1">
                 COMPLETED FILE OUTPUTS
               </p>

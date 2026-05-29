@@ -72,7 +72,7 @@ export default function DashboardOverview() {
       {/* HEADER GREETINGS */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-white">SonicScript Workspace</h2>
+          <h2 className="text-xl font-bold tracking-tight text-white">VoxNote Workspace</h2>
           <p className="text-xs text-stone-text-secondary mt-0.5">
             Welcome to your futuristic real-time transcription dashboard.
           </p>

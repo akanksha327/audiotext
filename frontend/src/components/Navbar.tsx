@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { transcriptService, TranscriptData, userService, UserData } from '../services/api.js';
+import { useTheme } from '../context/ThemeContext.js';
 
 interface NavbarProps {
   onScrollToApp?: () => void;
@@ -14,6 +15,8 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<'history' | 'settings' | 'profile' | null>(null);
   
+  const { theme, setTheme } = useTheme();
+  
   // Dropdown data states
   const [recents, setRecents] = useState<TranscriptData[]>([]);
   const [mics, setMics] = useState<MediaDeviceInfo[]>([]);
@@ -21,8 +24,8 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
   const [userProfile, setUserProfile] = useState<UserData | null>(null);
   
   // Settings preferences
-  const [lang, setLang] = useState(() => localStorage.getItem('sonic_lang') || 'en');
-  const [quality, setQuality] = useState(() => localStorage.getItem('sonic_quality') || 'high');
+  const [lang, setLang] = useState(() => localStorage.getItem('voxnote_lang') || 'en');
+  const [quality, setQuality] = useState(() => localStorage.getItem('voxnote_quality') || 'high');
 
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -103,16 +106,16 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
 
   // Update localStorage when setting variables change
   useEffect(() => {
-    localStorage.setItem('sonic_lang', lang);
+    localStorage.setItem('voxnote_lang', lang);
   }, [lang]);
 
   useEffect(() => {
-    localStorage.setItem('sonic_quality', quality);
+    localStorage.setItem('voxnote_quality', quality);
   }, [quality]);
 
   const handleSelectMic = (deviceId: string) => {
     setSelectedMic(deviceId);
-    localStorage.setItem('sonic_mic', deviceId);
+    localStorage.setItem('voxnote_mic', deviceId);
   };
 
   const handleSelectRecent = (id: string) => {
@@ -168,7 +171,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
           </div>
           <div className="flex flex-col items-start leading-none">
             <span className="text-sm font-semibold tracking-tight text-stone-text-primary">
-              SonicScript
+              VoxNote
             </span>
             <span className="text-[8px] font-mono tracking-widest text-brand-primary uppercase mt-0.5 flex items-center gap-1 font-bold">
               AI Active <span className="h-1.5 w-1.5 rounded-full bg-green-500 inline-block animate-pulse" />
@@ -365,6 +368,37 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
                     </div>
                   </div>
 
+                  {/* Appearance Switcher */}
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider block select-none">
+                      Appearance
+                    </span>
+                    <div className="grid grid-cols-2 gap-1 bg-stone-secondary border border-stone-border rounded-lg p-0.5 select-none">
+                      <button
+                        type="button"
+                        onClick={() => setTheme('light')}
+                        className={`py-1 text-[10px] font-semibold rounded capitalize cursor-pointer transition-all ${
+                          theme === 'light'
+                            ? 'bg-stone-card text-stone-text-primary shadow-sm border border-stone-border/20'
+                            : 'text-stone-text-secondary hover:text-stone-text-primary'
+                        }`}
+                      >
+                        Light Mode
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTheme('dark')}
+                        className={`py-1 text-[10px] font-semibold rounded capitalize cursor-pointer transition-all ${
+                          theme === 'dark'
+                            ? 'bg-stone-card text-stone-text-primary shadow-sm border border-stone-border/20'
+                            : 'text-stone-text-secondary hover:text-stone-text-primary'
+                        }`}
+                      >
+                        Dark Mode
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Settings logout divider */}
                   <div className="pt-2 border-t border-stone-border flex justify-end">
                     <button
@@ -388,7 +422,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
                 activeDropdown === 'profile' ? 'ring-2 ring-brand-primary' : 'border-stone-border hover:border-brand-primary'
               }`}
             >
-              SS
+              {userProfile?.avatar || 'VN'}
             </button>
 
             <AnimatePresence>
@@ -403,11 +437,11 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
                   {/* Profile Header */}
                   <div className="flex items-center gap-3 border-b border-stone-border pb-3 select-none">
                     <div className="h-10 w-10 rounded-full bg-brand-primary text-white flex items-center justify-center text-sm font-bold shadow-inner">
-                      {userProfile?.avatar || 'SS'}
+                      {userProfile?.avatar || 'VN'}
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-stone-text-primary truncate">{userProfile?.name || 'Sandbox User'}</p>
-                      <p className="text-[10px] text-stone-text-secondary truncate">{userProfile?.email || 'user@sonicscript.ai'}</p>
+                      <p className="text-[10px] text-stone-text-secondary truncate">{userProfile?.email || 'user@voxnote.ai'}</p>
                     </div>
                   </div>
 

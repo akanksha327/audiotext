@@ -29,7 +29,7 @@ let offlineTranscripts: TranscriptData[] = [
     _id: 'demo-1',
     title: 'Project Kickoff Meeting',
     duration: 72,
-    text: 'Welcome everyone to the SonicScript kickoff meeting. Today we are launching our new AI speech-to-text SaaS foundation. We will focus on extreme visual premium feel, responsive panels, high accessibility, and instant downloads. The goal is to provide human-crafted layouts with zero template clutter.',
+    text: 'Welcome everyone to the VoxNote kickoff meeting. Today we are launching our new AI speech-to-text SaaS foundation. We will focus on extreme visual premium feel, responsive panels, high accessibility, and instant downloads. The goal is to provide human-crafted layouts with zero template clutter.',
     status: 'completed',
     language: 'en',
     accuracy: 97,
@@ -140,8 +140,8 @@ export const userService = {
 
       return {
         name: 'Sandbox User',
-        email: 'user@sonicscript.ai',
-        avatar: 'SS',
+        email: 'user@voxnote.ai',
+        avatar: 'VN',
         accountType: 'Premium AI Sandbox',
         storageLimit: 100 * 1024 * 1024, // 100MB
         storageUsed: 4.2 * 1024 * 1024 + totalOfflineSize,

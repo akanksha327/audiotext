@@ -1,7 +1,7 @@
 {
-  "name": "sonicscript-backend",
+  "name": "voxnote-backend",
   "version": "1.0.0",
-  "description": "Backend API for SonicScript AI Transcription Platform",
+  "description": "Backend API for VoxNote Real-Time Voice Transcription Platform",
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
@@ -16,7 +16,7 @@
     "ai",
     "saas"
   ],
-  "author": "SonicScript Team",
+  "author": "VoxNote Team",
   "license": "MIT",
   "dependencies": {
     "@deepgram/sdk": "^5.3.0",

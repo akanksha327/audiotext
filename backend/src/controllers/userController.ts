@@ -7,13 +7,13 @@ import { ApiResponse } from '../utils/apiResponse.js';
  */
 export const getUserProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    let user = await User.findOne({ email: 'user@sonicscript.ai' });
+    let user = await User.findOne({ email: 'user@voxnote.ai' });
     if (!user) {
       // Fallback in case of startup delay or seeding bypass
       user = await User.create({
         name: 'Sandbox User',
-        email: 'user@sonicscript.ai',
-        avatar: 'SS',
+        email: 'user@voxnote.ai',
+        avatar: 'VN',
         accountType: 'Premium AI Sandbox',
         storageLimit: 100 * 1024 * 1024, // 100MB
         storageUsed: 4.2 * 1024 * 1024,  // 4.2MB starter data

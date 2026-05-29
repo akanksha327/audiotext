@@ -15,10 +15,10 @@ type TabType = 'transcript' | 'summary' | 'insights' | 'translation';
 // Local Mock Translation Dictionary
 const translationsDict: Record<string, Record<string, string>> = {
   'demo-1': {
-    es: 'Bienvenidos todos a la reunión de lanzamiento de SonicScript. Hoy estamos lanzando nuestra nueva base SaaS de IA de voz a texto. Nos centraremos en una sensación visual extrema, paneles receptivos, alta accesibilidad y descargas instantáneas.',
-    fr: 'Bienvenue à tous à la réunion de lancement de SonicScript. Aujourd\'hui, nous lançons notre nouvelle base SaaS d\'IA de conversion parole-texte. Nous nous concentrerons sur une sensation visuelle extrême, des panneaux réactifs, une accessibilité élevée et des téléchargements instantanés.',
-    de: 'Begrüßen Sie alle zum SonicScript Kickoff-Meeting. Heute starten wir unser neues KI-Sprach-zu-Text-SaaS-Fundament. Wir werden sich auf extremes visuelles Premium-Feeling, reaktionsschnelle Panels, hohe Barrierefreiheit und sofortige Downloads konzentrieren.',
-    ja: 'SonicScriptキックオフミーティングへようこそ。本日、新しいAI音声テキスト変換SaaSファンデーションを立ち上げます。極限의 プレミアムな視覚的感触、応答性の高いパネル、高いアクセシビリティ、そして即時ダウンロードに焦点を当てます。'
+    es: 'Bienvenidos todos a la reunión de lanzamiento de VoxNote. Hoy estamos lanzando nuestra nueva base SaaS de IA de voz a texto. Nos centraremos en una sensación visual extrema, paneles receptivos, alta accesibilidad y descargas instantáneas.',
+    fr: 'Bienvenue à tous à la réunion de lancement de VoxNote. Aujourd\'hui, nous lançons notre nouvelle base SaaS d\'IA de conversion parole-texte. Nous nous concentrerons sur une sensation visuelle extrême, des panneaux réactifs, une accessibilité élevée et des téléchargements instantanés.',
+    de: 'Begrüßen Sie alle zum VoxNote Kickoff-Meeting. Heute starten wir unser neues KI-Sprach-zu-Text-SaaS-Fundament. Wir werden sich auf extremes visuelles Premium-Feeling, reaktionsschnelle Panels, hohe Barrierefreiheit und sofortige Downloads konzentrieren.',
+    ja: 'VoxNoteキックオフミーティングへようこそ。本日、新しいAI音声テキスト変換SaaSファンデーションを立ち上げます。極限のプレミアムな視覚的感触、応答性の高いパネル、高いアクセシビリティ、 tender即時ダウンロードに焦点を当てます。'
   },
   'demo-2': {
     es: 'Creo que deberíamos apegarnos a una estética humana y limpia. Evitemos los verdes y morados de neón artificiales. Superficies de gris carbón profundo, tipografía de sistema premium como Inter, tarjetas sutiles con bordes glassmorphic y botones muy suaves y elegantes.',
@@ -131,7 +131,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
 
   const handleDownloadTxt = (transcript: TranscriptData) => {
     const blob = new Blob([
-      `SonicScript Audio Transcript\n`,
+      `VoxNote Transcript\n`,
       `=============================\n`,
       `Title: ${transcript.title}\n`,
       `Duration: ${formatDuration(transcript.duration)}\n`,
@@ -178,12 +178,12 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
             <div class="meta">
               <span><strong>Date:</strong> ${date}</span>
               <span><strong>Duration:</strong> ${duration}</span>
-              <span><strong>Generated via:</strong> SonicScript AI</span>
+              <span><strong>Generated via:</strong> VoxNote</span>
             </div>
           </div>
           <div class="content">${transcript.text}</div>
           <div class="footer">
-            © ${new Date().getFullYear()} SonicScript Inc. - Premium Speech Recognition
+            © ${new Date().getFullYear()} VoxNote - Real-Time Voice Transcription
           </div>
         </body>
       </html>
@@ -239,10 +239,10 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
     }
     
     const mappings: Record<string, string> = {
-      es: 'Traducción: Bienvenidos a la plataforma SonicScript. Su transcripción de audio se ha procesado con alta fidelidad.',
-      fr: 'Traduction: Bienvenue sur la plateforme SonicScript. Votre transcription audio a été traitée avec succès.',
-      de: 'Übersetzung: Willkommen auf der SonicScript-Plattform. Ihre Transkription wurde erfolgreich verarbeitet.',
-      ja: '翻訳: SonicScriptプラットフォームへようこそ。文字起こしが正常に完了しました。'
+      es: 'Traducción: Bienvenidos a la plataforma VoxNote. Su transcripción de audio se ha procesado con alta fidelidad.',
+      fr: 'Traduction: Bienvenue sur la plateforme VoxNote. Votre transcription audio a été traitée avec succès.',
+      de: 'Übersetzung: Willkommen auf der VoxNote-Plattform. Ihre Transkription wurde erfolgreich verarbeitet.',
+      ja: '翻訳: VoxNoteプラットフォームへようこそ。文字起こしが正常に完了しました。'
     };
     return mappings[lang] || transcript.text;
   };
@@ -306,11 +306,11 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
             {loading ? (
               <div className="py-16 text-center text-xs text-stone-text-secondary">
                 <RefreshCw className="h-4 w-4 animate-spin mx-auto mb-2 text-brand-primary" />
-                Loading transcription catalog...
+                Loading recording history...
               </div>
             ) : filtered.length === 0 ? (
               <div className="py-20 text-center border border-dashed border-stone-border rounded-xl text-xs text-stone-text-secondary">
-                No transcripts match criteria.
+                No recordings match criteria.
               </div>
             ) : (
               filtered.map((item) => {
@@ -516,7 +516,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                           : 'border-transparent text-stone-text-secondary hover:text-stone-text-primary'
                       }`}
                     >
-                      {tab === 'insights' ? 'Insights' : tab === 'summary' ? 'Summary' : tab === 'translation' ? 'Translation' : 'Transcript'}
+                      {tab === 'insights' ? 'Key Points' : tab === 'summary' ? 'Quick Summary' : tab === 'translation' ? 'Translate Transcript' : 'Transcript'}
                     </button>
                   ))}
                 </div>
@@ -663,7 +663,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                         className="space-y-4 text-left"
                       >
                         <div className="flex items-center justify-between border-b border-stone-border pb-2 select-none">
-                          <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider">Language translation</span>
+                          <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider">Translate Transcript</span>
                           
                           <select
                             value={selectedLang}

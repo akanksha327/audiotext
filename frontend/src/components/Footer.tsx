@@ -12,10 +12,10 @@ export default function Footer() {
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-primary/10 border border-brand-primary/20">
                 <Mic className="h-4 w-4 text-brand-primary" />
               </div>
-              <span className="text-sm font-semibold tracking-tight text-stone-text-primary">SonicScript</span>
+              <span className="text-sm font-semibold tracking-tight text-stone-text-primary">VoxNote</span>
             </div>
             <p className="max-w-xs text-xs leading-relaxed">
-              Secure, premium speech-to-text platform transcribing audio instantly inside modern browsers.
+              Record your voice, convert it into text instantly, and keep everything organized in one place.
             </p>
           </div>
 
@@ -63,7 +63,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-12 border-t border-stone-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <p>© {new Date().getFullYear()} SonicScript Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} VoxNote Inc. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-brand-primary transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-brand-primary transition-colors">Terms of Service</a>

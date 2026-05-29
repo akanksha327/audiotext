@@ -13,6 +13,7 @@ export interface ITranscript extends Document {
   fileSize?: number; // in bytes
   mimeType?: string;
   accuracy?: number; // in percentage
+  recordingId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -78,6 +79,10 @@ const TranscriptSchema = new Schema<ITranscript>(
       default: 95,
       min: [0, 'Accuracy cannot be less than 0'],
       max: [100, 'Accuracy cannot exceed 100'],
+    },
+    recordingId: {
+      type: String,
+      required: false,
     },
   },
   {

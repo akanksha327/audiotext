@@ -10,8 +10,8 @@ const seedSandboxUser = async (): Promise<void> => {
     if (count === 0) {
       await User.create({
         name: 'Sandbox User',
-        email: 'user@sonicscript.ai',
-        avatar: 'SS',
+        email: 'user@voxnote.ai',
+        avatar: 'VN',
         accountType: 'Premium AI Sandbox',
         storageLimit: 100 * 1024 * 1024, // 100MB
         storageUsed: 4.2 * 1024 * 1024,  // 4.2MB starter data
@@ -25,7 +25,7 @@ const seedSandboxUser = async (): Promise<void> => {
 
 export const connectDB = async (): Promise<void> => {
   try {
-    const connString = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/sonicscript';
+    const connString = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/voxnote';
     console.log(`Connecting to MongoDB at: ${connString.replace(/:([^:@]+)@/, ':****@')}`);
     
     const conn = await mongoose.connect(connString);

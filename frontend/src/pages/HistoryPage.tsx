@@ -74,7 +74,7 @@ export default function HistoryPage() {
       <div className="flex items-center gap-2 border-b border-stone-border pb-3 select-none">
         <ListFilter className="h-5 w-5 text-brand-primary" />
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-white">Audio Transcripts Catalog</h2>
+          <h2 className="text-xl font-bold tracking-tight text-white">Recording History</h2>
           <p className="text-xs text-stone-text-secondary mt-0.5">
             Search, filter, view summaries, translate languages, rename records, and delete documents.
           </p>

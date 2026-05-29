@@ -73,7 +73,7 @@ export default function DashboardLayout() {
 
   const getPageTitle = () => {
     const active = sidebarItems.find(item => item.path === location.pathname);
-    return active ? active.name : 'SonicScript Workspace';
+    return active ? active.name : 'VoxNote Workspace';
   };
 
   return (
@@ -109,7 +109,7 @@ export default function DashboardLayout() {
                     <div className="h-8 w-8 rounded-lg bg-brand-primary flex items-center justify-center text-white">
                       <Mic className="h-4.5 w-4.5" />
                     </div>
-                    <span className="font-bold tracking-tight text-sm">SonicScript Dashboard</span>
+                    <span className="font-bold tracking-tight text-sm">VoxNote Dashboard</span>
                   </div>
                   <button onClick={() => setMobileOpen(false)} className="p-1 rounded-lg border border-stone-border text-stone-text-secondary">
                     <X className="h-4 w-4" />
@@ -171,7 +171,7 @@ export default function DashboardLayout() {
                   animate={{ opacity: 1 }}
                   className="font-bold tracking-tight text-xs bg-gradient-to-r from-brand-primary to-brand-accent bg-clip-text text-transparent"
                 >
-                  SonicScript
+                  VoxNote
                 </motion.span>
               )}
             </Link>
@@ -232,11 +232,11 @@ export default function DashboardLayout() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 px-1">
                 <div className="h-7 w-7 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-bold shrink-0">
-                  {userProfile?.avatar || 'SS'}
+                  {userProfile?.avatar || 'VN'}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-[10px] font-bold text-stone-text-primary truncate">{userProfile?.name || 'Sandbox User'}</p>
-                  <p className="text-[9px] text-stone-text-secondary truncate">{userProfile?.email || 'user@sonicscript.ai'}</p>
+                  <p className="text-[9px] text-stone-text-secondary truncate">{userProfile?.email || 'user@voxnote.ai'}</p>
                 </div>
               </div>
               <button
