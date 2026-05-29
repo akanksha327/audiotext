@@ -1,62 +1,54 @@
 @import "tailwindcss";
 
 @theme {
-  /* SonicScript Color Palette - Burgundy Theme */
+  /* SonicScript Color Palette - Minimal Stone Theme */
   --color-brand-primary: var(--brand-primary);
   --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
   
   --color-stone-bg: var(--stone-bg);
   --color-stone-secondary: var(--stone-secondary);
   --color-stone-card: var(--stone-card);
   --color-stone-text-primary: var(--stone-text-primary);
   --color-stone-text-secondary: var(--stone-text-secondary);
+  --color-stone-text-muted: var(--stone-text-muted);
   --color-stone-border: var(--stone-border);
   
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-
-  --animate-float-orb: float-orb 20s infinite alternate;
-}
-
-@keyframes float-orb {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.08); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
-  100% { transform: translate(0px, 0px) scale(1); }
 }
 
 :root {
-  --brand-primary: #800020;
-  --brand-primary-hover: #5F0018;
+  /* Modern Minimalist Refined Reddish-Brown Color Palette */
+  --brand-primary: #A44A3F; /* Accent Color: Reddish-Brown */
+  --brand-primary-hover: #C26A5A; /* Darker accent for hover */
+  --brand-accent: #C26A5A;
+  --brand-accent-hover: #D17C6B;
   
-  --stone-bg: #F5F5F4;
-  --stone-secondary: #E7E5E4;
-  --stone-card: #FFFFFF;
-  --stone-text-primary: #1C1917;
-  --stone-text-secondary: #57534E;
-  --stone-border: #D6D3D1;
+  --stone-bg: #F5F5F4; /* Main background */
+  --stone-secondary: #E7E5E4; /* Secondary background */
+  --stone-card: #FFFFFF; /* White cards */
+  --stone-text-primary: #1C1917; /* Primary text */
+  --stone-text-secondary: #57534E; /* Secondary text */
+  --stone-text-muted: #8A746C; /* Muted text (with reddish-brown hint) */
+  --stone-border: #D6D3D1; /* Thin border color */
 }
 
-html.dark {
-  --brand-primary: #D64561;
-  --brand-primary-hover: #E6677F;
-  
-  --stone-bg: #1C1917;
-  --stone-secondary: #292524;
-  --stone-card: #23201F;
-  --stone-text-primary: #F5F5F4;
-  --stone-text-secondary: #A8A29E;
-  --stone-border: #44403C;
+/* Force light theme always to align with user's specific theme request */
+html, body {
+  background-color: var(--stone-bg);
+  color: var(--stone-text-primary);
 }
 
-/* Enable smooth transitions across light/dark variables */
+/* Enable smooth transitions across variables */
 html, body, .minimal-panel, button, input, textarea, select, a, span, p, h1, h2, h3, h4, h5, h6 {
-  transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -65,45 +57,63 @@ html, body, .minimal-panel, button, input, textarea, select, a, span, p, h1, h2,
 
 ::-webkit-scrollbar-thumb {
   background: var(--stone-border);
-  border-radius: 4px;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--brand-primary);
 }
 
-/* Minimal design panels with burgundy tints */
-.minimal-panel {
-  background: var(--stone-card);
-  border: 1px solid var(--stone-border);
-  box-shadow: 0 1px 3px 0 rgba(128, 0, 32, 0.02), 0 1px 2px -1px rgba(128, 0, 32, 0.02);
-  border-radius: 12px;
+/* Premium panels with soft shadows and thin borders */
+.glass-panel, .minimal-panel {
+  background: var(--stone-card) !important;
+  border: 1px solid var(--stone-border) !important;
+  box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02) !important;
+  border-radius: 12px !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-.minimal-panel-interactive {
+.glass-panel-interactive, .minimal-panel-interactive {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.minimal-panel-interactive:hover {
-  border-color: var(--brand-primary);
-  box-shadow: 0 4px 6px -1px rgba(128, 0, 32, 0.04), 0 2px 4px -2px rgba(128, 0, 32, 0.04);
+.glass-panel-interactive:hover, .minimal-panel-interactive:hover {
+  border-color: var(--brand-primary) !important;
+  box-shadow: 0 6px 24px -2px rgba(28, 25, 23, 0.06), 0 2px 12px -1px rgba(28, 25, 23, 0.03) !important;
+  transform: translateY(-1px);
 }
 
 /* Highlight transcribing words */
 .word-active {
-  color: var(--stone-text-primary);
-  font-weight: 600;
-  border-bottom: 2px solid var(--brand-primary);
+  color: var(--brand-primary-hover) !important;
+  font-weight: 600 !important;
+  border-bottom: 1.5px solid var(--brand-primary-hover) !important;
+  text-shadow: none !important;
 }
 
-/* Custom Waveform Animation */
+/* Custom Waveform Animation (Minimal) */
 @keyframes wave-bar {
   0%, 100% {
     height: 4px;
-    opacity: 0.5;
+    opacity: 0.6;
   }
   50% {
     height: 14px;
     opacity: 1;
   }
+}
+
+/* Text styles */
+.text-neon-gradient {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: unset !important;
+  color: var(--stone-text-primary) !important;
+}
+
+/* Patterns removed to adhere to 'No extra decorations' */
+.bg-grid-pattern, .bg-dot-pattern {
+  background: none !important;
+  background-image: none !important;
 }

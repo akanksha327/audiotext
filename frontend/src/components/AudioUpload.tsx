@@ -1,13 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { Upload, FileAudio, Check, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 interface AudioUploadProps {
   onTranscribeComplete: (
     title: string, 
     duration: number, 
     text: string, 
-    metadata?: { fileName?: string; fileSize?: number; mimeType?: string }
+    metadata?: { _id?: string; fileName?: string; fileSize?: number; mimeType?: string; alreadySaved?: boolean; accuracy?: number }
   ) => Promise<void>;
 }
 
@@ -105,26 +106,42 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
     }, 950);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      
-      const fileTitle = file.name.replace(/\.[^/.]+$/, "");
-      const simulatedDuration = Math.floor(Math.random() * 120) + 30; 
-      const simulatedText = "Welcome to SonicScript transcription portal. This text simulates the transcript processed from your uploaded audio file. It covers speaker segments, timestamps, and punctuation automatically formatted by our backend AI.";
+      // Use FormData to send file directly as multipart form data
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('duration', (Math.floor(Math.random() * 120) + 30).toString());
 
-      await onTranscribeComplete(fileTitle, simulatedDuration, simulatedText, {
-        fileName: file.name,
-        fileSize: file.size,
-        mimeType: file.type
+      // Post to backend upload-file endpoint (Multer)
+      const response = await axios.post('http://localhost:5000/api/transcripts/upload-file', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
-      
-      clearInterval(stepInterval);
-      setSuccess(true);
-      setFile(null);
+
+      if (response.data && response.data.success) {
+        const item = response.data.data;
+        
+        await onTranscribeComplete(item.title, item.duration, item.text, {
+          _id: item._id,
+          fileName: item.fileName,
+          fileSize: item.fileSize,
+          mimeType: item.mimeType,
+          alreadySaved: true,
+          accuracy: item.accuracy
+        });
+        
+        clearInterval(stepInterval);
+        setSuccess(true);
+        setFile(null);
+      } else {
+        throw new Error('Upload transcription request failed');
+      }
     } catch (err) {
       setError('Failed to process the transcription. Please try again.');
       console.error(err);
     } finally {
       setIsProcessing(false);
+      clearInterval(stepInterval);
     }
   };
 

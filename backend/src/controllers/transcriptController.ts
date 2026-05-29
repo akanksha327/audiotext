@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Transcript } from '../models/Transcript.js';
 import { User } from '../models/User.js';
 import { ApiResponse } from '../utils/apiResponse.js';
+import { DeepgramClient } from '@deepgram/sdk';
 
 // Pre-populated transcripts for demo fallback when DB is empty or disconnected
 const demoTranscripts = [
@@ -74,7 +75,7 @@ export const getTranscripts = async (req: Request, res: Response, next: NextFunc
  */
 export const createTranscript = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { title, duration, text, status, language, fileName, fileSize, mimeType, accuracy } = req.body;
+    const { title, duration, text, status, language, source, fileName, fileSize, mimeType, accuracy } = req.body;
 
     const transcriptDuration = duration || Math.floor(Math.random() * 90) + 10; // default 10-100s
     const transcriptTitle = title || 'Speech Record';
@@ -94,6 +95,7 @@ export const createTranscript = async (req: Request, res: Response, next: NextFu
         text: transcriptText,
         status: status || 'completed',
         language: language || 'en',
+        source: source || 'recording',
         user: userId,
         fileName: fileName || 'Upload.mp3',
         fileSize: finalSize,
@@ -117,6 +119,7 @@ export const createTranscript = async (req: Request, res: Response, next: NextFu
         text: transcriptText,
         status: status || 'completed',
         language: language || 'en',
+        source: source || 'recording',
         accuracy: finalAccuracy,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -124,6 +127,40 @@ export const createTranscript = async (req: Request, res: Response, next: NextFu
     }
 
     ApiResponse.success(res, newTranscript, 'Transcript created successfully', 201);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get single transcript by ID
+ */
+export const getTranscriptById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    // Handle demo transcripts
+    if (id.startsWith('demo-')) {
+      const demo = demoTranscripts.find(t => t._id === id);
+      if (demo) {
+        ApiResponse.success(res, demo, 'Fetched demo transcript successfully');
+        return;
+      }
+    }
+
+    let transcript = null;
+    try {
+      transcript = await Transcript.findById(id);
+    } catch (dbError) {
+      console.warn('Database query failed or DB offline.');
+    }
+
+    if (!transcript) {
+      ApiResponse.error(res, 'Transcript not found', 404);
+      return;
+    }
+
+    ApiResponse.success(res, transcript, 'Fetched transcript successfully');
   } catch (error) {
     next(error);
   }
@@ -169,3 +206,146 @@ export const deleteTranscript = async (req: Request, res: Response, next: NextFu
     next(error);
   }
 };
+
+/**
+ * Upload and transcribe an audio file using Deepgram
+ */
+export const uploadAudioTranscript = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { fileData, fileName, mimeType, duration } = req.body;
+
+    if (!fileData) {
+      ApiResponse.error(res, 'File data is required (base64 encoded)', 400);
+      return;
+    }
+
+    const fileBuffer = Buffer.from(fileData, 'base64');
+    const finalSize = fileBuffer.length;
+    const transcriptDuration = duration || Math.floor(finalSize / 16000) || 30; // fallback duration estimate
+    const fileTitle = fileName ? fileName.replace(/\.[^/.]+$/, "") : 'Uploaded Audio';
+
+    let transcribedText = "";
+    const apiKey = process.env.DEEPGRAM_API_KEY;
+
+    if (apiKey && apiKey !== 'your_deepgram_api_key_here') {
+      try {
+        const deepgram = new DeepgramClient({ apiKey });
+        const response: any = await deepgram.listen.v1.media.transcribeFile(
+          fileBuffer,
+          {
+            model: "nova-2",
+            smart_format: true,
+          }
+        );
+
+        transcribedText = response.results?.channels?.[0]?.alternatives?.[0]?.transcript || "";
+        console.log(`[Deepgram File STT] Completed transcription of ${fileName}`);
+      } catch (dgError: any) {
+        console.error('[Deepgram File STT] Failed:', dgError);
+        throw new Error('Deepgram transcription failed: ' + dgError.message);
+      }
+    } else {
+      console.warn('[Deepgram File STT] API key missing, using simulated text.');
+      transcribedText = "Welcome to SonicScript transcription portal. This is a simulated fallback text since the Deepgram API key is not configured in your env file.";
+    }
+
+    // Find default seeded user
+    const defaultUser = await User.findOne({ email: 'user@sonicscript.ai' });
+    const userId = defaultUser ? defaultUser._id : undefined;
+
+    const newTranscript = await Transcript.create({
+      title: fileTitle,
+      duration: transcriptDuration,
+      text: transcribedText || "No audible speech detected.",
+      status: 'completed',
+      language: 'en',
+      source: 'upload',
+      user: userId,
+      fileName: fileName || 'Upload.mp3',
+      fileSize: finalSize,
+      mimeType: mimeType || 'audio/mpeg',
+      accuracy: 98
+    });
+
+    if (defaultUser) {
+      defaultUser.storageUsed += finalSize;
+      await defaultUser.save();
+    }
+
+    ApiResponse.success(res, newTranscript, 'File transcribed and saved successfully', 201);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Upload and transcribe an audio file using Multer and Deepgram
+ */
+export const uploadAudioFileTranscript = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    if (!req.file) {
+      ApiResponse.error(res, 'No audio file uploaded', 400);
+      return;
+    }
+
+    const fileBuffer = req.file.buffer;
+    const finalSize = fileBuffer.length;
+    const fileName = req.file.originalname;
+    const mimeType = req.file.mimetype;
+    
+    const duration = req.body.duration ? parseInt(req.body.duration) : Math.floor(finalSize / 16000) || 30;
+    const fileTitle = fileName.replace(/\.[^/.]+$/, "");
+
+    let transcribedText = "";
+    const apiKey = process.env.DEEPGRAM_API_KEY;
+
+    if (apiKey && apiKey !== 'your_deepgram_api_key_here') {
+      try {
+        const deepgram = new DeepgramClient({ apiKey });
+        const response: any = await deepgram.listen.v1.media.transcribeFile(
+          fileBuffer,
+          {
+            model: "nova-2",
+            smart_format: true,
+          }
+        );
+
+        transcribedText = response.results?.channels?.[0]?.alternatives?.[0]?.transcript || "";
+        console.log(`[Deepgram File STT] Completed transcription of ${fileName}`);
+      } catch (dgError: any) {
+        console.error('[Deepgram File STT] Failed:', dgError);
+        throw new Error('Deepgram transcription failed: ' + dgError.message);
+      }
+    } else {
+      console.warn('[Deepgram File STT] API key missing, using simulated text.');
+      transcribedText = "Welcome to SonicScript transcription portal. This is a simulated fallback text since the Deepgram API key is not configured in your env file.";
+    }
+
+    const defaultUser = await User.findOne({ email: 'user@sonicscript.ai' });
+    const userId = defaultUser ? defaultUser._id : undefined;
+
+    const newTranscript = await Transcript.create({
+      title: fileTitle,
+      duration,
+      text: transcribedText || "No audible speech detected.",
+      status: 'completed',
+      language: 'en',
+      source: 'upload',
+      user: userId,
+      fileName,
+      fileSize: finalSize,
+      mimeType,
+      accuracy: 98
+    });
+
+    if (defaultUser) {
+      defaultUser.storageUsed += finalSize;
+      await defaultUser.save();
+    }
+
+    ApiResponse.success(res, newTranscript, 'File transcribed and saved successfully', 201);
+  } catch (error) {
+    next(error);
+  }
+};
+

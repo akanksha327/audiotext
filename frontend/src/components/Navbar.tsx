@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { 
-  Mic, Settings, History, Sun, Moon, Laptop, LogOut, 
+  Mic, Settings, History, LogOut, 
   ChevronDown, Globe, Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,9 +23,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
   // Settings preferences
   const [lang, setLang] = useState(() => localStorage.getItem('sonic_lang') || 'en');
   const [quality, setQuality] = useState(() => localStorage.getItem('sonic_quality') || 'high');
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
-    return (localStorage.getItem('theme') as 'light' | 'dark' | 'system') || 'system';
-  });
+
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -101,31 +99,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
     return () => window.removeEventListener('transcripts-updated', handleUpdate);
   }, []);
 
-  // Theme application
-  useEffect(() => {
-    const root = document.documentElement;
-    localStorage.setItem('theme', theme);
-    
-    const applyTheme = (isDark: boolean) => {
-      if (isDark) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
-    };
 
-    if (theme === 'system') {
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      applyTheme(systemDark);
-      
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const listener = (e: MediaQueryListEvent) => applyTheme(e.matches);
-      mediaQuery.addEventListener('change', listener);
-      return () => mediaQuery.removeEventListener('change', listener);
-    } else {
-      applyTheme(theme === 'dark');
-    }
-  }, [theme]);
 
   // Update localStorage when setting variables change
   useEffect(() => {
@@ -205,12 +179,26 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
         {/* Navigation Dropdowns Row */}
         <div className="flex items-center gap-2.5" ref={dropdownRef}>
           
-          {/* Dashboard Quick Scroll */}
+          {/* Workspace Link */}
           <button 
-            onClick={onScrollToApp}
+            onClick={() => {
+              const el = document.getElementById('workspace-hub');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
             className="hidden sm:inline-flex items-center justify-center text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-secondary border border-stone-border rounded-lg px-3.5 py-1.5 transition-all shadow-sm cursor-pointer select-none"
           >
-            Dashboard
+            Workspace
+          </button>
+
+          {/* History Link */}
+          <button 
+            onClick={() => {
+              const el = document.getElementById('history-list');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="hidden sm:inline-flex items-center justify-center text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-secondary border border-stone-border rounded-lg px-3.5 py-1.5 transition-all shadow-sm cursor-pointer select-none"
+          >
+            History
           </button>
 
           {/* History Dropdown Trigger */}
@@ -312,28 +300,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
                     <h3 className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider">AI Platform Settings</h3>
                   </div>
 
-                  {/* Dark Mode Toggle Options */}
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider block">Theme Mode</span>
-                    <div className="grid grid-cols-3 gap-1 bg-stone-secondary border border-stone-border rounded-lg p-0.5">
-                      {(['light', 'dark', 'system'] as const).map((t) => (
-                        <button
-                          key={t}
-                          onClick={() => setTheme(t)}
-                          className={`flex items-center justify-center gap-1.5 py-1 text-[10px] font-semibold rounded capitalize cursor-pointer transition-colors ${
-                            theme === t
-                              ? 'bg-stone-card text-stone-text-primary shadow-sm'
-                              : 'text-stone-text-secondary hover:text-stone-text-primary'
-                          }`}
-                        >
-                          {t === 'light' && <Sun className="h-3 w-3" />}
-                          {t === 'dark' && <Moon className="h-3 w-3" />}
-                          {t === 'system' && <Laptop className="h-3 w-3" />}
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+
 
                   {/* Language Selection */}
                   <div className="space-y-1.5">

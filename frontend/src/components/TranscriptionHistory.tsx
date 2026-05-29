@@ -165,11 +165,11 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
           <title>${title}</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 40px; color: #231f20; line-height: 1.6; }
-            .header { border-bottom: 2px solid #800020; padding-bottom: 20px; margin-bottom: 30px; }
-            h1 { color: #800020; margin: 0 0 10px 0; font-size: 24px; }
-            .meta { font-size: 11px; color: #5C4E50; display: flex; gap: 20px; }
+            .header { border-bottom: 2px solid #A44A3F; padding-bottom: 20px; margin-bottom: 30px; }
+            h1 { color: #A44A3F; margin: 0 0 10px 0; font-size: 24px; }
+            .meta { font-size: 11px; color: #8A746C; display: flex; gap: 20px; }
             .content { font-size: 13px; text-align: justify; white-space: pre-wrap; }
-            .footer { margin-top: 50px; border-top: 1px solid #EADEE0; padding-top: 20px; font-size: 10px; color: #5C4E50; text-align: center; }
+            .footer { margin-top: 50px; border-top: 1px solid #4B342F; padding-top: 20px; font-size: 10px; color: #8A746C; text-align: center; }
           </style>
         </head>
         <body>

@@ -56,7 +56,7 @@ export default function Footer() {
               </a>
             </div>
             <p className="text-[10px] leading-relaxed pt-2">
-              Designed with care in a refined burgundy aesthetic.
+              Designed with care in a refined minimal aesthetic.
             </p>
           </div>
         </div>

@@ -5,8 +5,9 @@ export interface ITranscript extends Document {
   audioUrl?: string;
   duration: number; // in seconds
   text: string;
-  status: 'pending' | 'completed' | 'failed';
+  status: 'pending' | 'processing' | 'completed' | 'failed';
   language: string;
+  source?: string; // 'recording' | 'upload' etc.
   user?: Types.ObjectId;
   fileName?: string;
   fileSize?: number; // in bytes
@@ -20,7 +21,7 @@ const TranscriptSchema = new Schema<ITranscript>(
   {
     title: {
       type: String,
-      required: true,
+      required: [true, 'Title is required'],
       default: 'Untitled Audio',
       trim: true,
     },
@@ -30,21 +31,27 @@ const TranscriptSchema = new Schema<ITranscript>(
     },
     duration: {
       type: Number,
-      required: true,
+      required: [true, 'Duration is required'],
       default: 0,
+      min: [0, 'Duration cannot be negative'],
     },
     text: {
       type: String,
-      required: true,
+      required: [true, 'Transcript text is required'],
     },
     status: {
       type: String,
-      enum: ['pending', 'completed', 'failed'],
+      enum: ['pending', 'processing', 'completed', 'failed'],
       default: 'completed',
     },
     language: {
       type: String,
       default: 'en',
+    },
+    source: {
+      type: String,
+      required: false,
+      default: 'recording',
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -59,6 +66,7 @@ const TranscriptSchema = new Schema<ITranscript>(
       type: Number,
       required: false,
       default: 0,
+      min: [0, 'File size cannot be negative'],
     },
     mimeType: {
       type: String,
@@ -68,6 +76,8 @@ const TranscriptSchema = new Schema<ITranscript>(
       type: Number,
       required: false,
       default: 95,
+      min: [0, 'Accuracy cannot be less than 0'],
+      max: [100, 'Accuracy cannot exceed 100'],
     },
   },
   {
