@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   FileText, Mic, Upload, Clock, ArrowRight, Activity, 
-  Sparkles, HardDrive
+  HardDrive
 } from 'lucide-react';
 import { transcriptService, TranscriptData } from '../services/api.js';
 
@@ -195,7 +195,7 @@ export default function DashboardOverview() {
             </div>
           ) : transcripts.length === 0 ? (
             <div className="minimal-panel p-12 text-center text-stone-text-secondary border-dashed flex flex-col items-center">
-              <Sparkles className="h-8 w-8 opacity-40 mb-3 text-brand-accent" />
+              <Activity className="h-8 w-8 opacity-40 mb-3 text-brand-accent" />
               <p className="text-xs font-bold">No active transcriptions found</p>
               <p className="text-[10px] text-stone-text-secondary/70 mt-1">Launch recorder to create your first speech transcription.</p>
             </div>
@@ -238,7 +238,7 @@ export default function DashboardOverview() {
         {/* SYSTEM STATUS WIDGET (Right 1 Column) */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 border-b border-stone-border pb-3">
-            <Sparkles className="h-4 w-4 text-brand-accent" />
+            <Activity className="h-4 w-4 text-brand-accent" />
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">Neural Core Status</h3>
           </div>
 

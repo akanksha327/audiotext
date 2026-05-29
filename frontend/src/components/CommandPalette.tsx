@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, LayoutDashboard, Mic, Upload, History, Settings, 
-  Moon, Sun, Sparkles, Terminal
+  Moon, Sun, Terminal
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext.jsx';
 
@@ -87,7 +87,7 @@ export default function CommandPalette() {
       id: 'ai-status',
       name: 'Check AI Engine Connectivity',
       category: 'Diagnostics',
-      icon: Sparkles,
+      icon: Terminal,
       action: () => showToast('Speech Recognition pipeline fully operational', 'success')
     }
   ];

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FileText, Copy, Trash2, Check, Sparkles
+  FileText, Copy, Trash2, Check
 } from 'lucide-react';
 import AudioRecorder from '../components/AudioRecorder.jsx';
 import { useToast } from '../context/ToastContext.jsx';
@@ -110,7 +110,7 @@ export default function RecordPage() {
           
           <div>
             <h3 className="text-[10px] font-bold text-stone-text-muted flex items-center gap-2 mb-8 uppercase tracking-widest">
-              <Sparkles className="h-3.5 w-3.5 text-brand-primary" /> Audio Capture Core
+              Audio Capture Core
             </h3>
 
             <div className="flex items-center justify-center py-6">

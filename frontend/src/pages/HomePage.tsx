@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Upload, Mic, FileText, Copy, Trash2, 
-  Check, ListFilter, Sparkles
+  Check, ListFilter
 } from 'lucide-react';
 import AudioUpload from '../components/AudioUpload.jsx';
 import AudioRecorder from '../components/AudioRecorder.jsx';
@@ -307,7 +307,7 @@ export default function HomePage() {
         <section className="pt-16 pb-12 text-center md:pt-20 md:pb-16 select-none max-w-3xl mx-auto">
           <div className="flex flex-col items-center">
             <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[9px] font-bold bg-brand-primary/10 border border-brand-primary/20 text-brand-primary mb-5 tracking-wider uppercase">
-              <Sparkles className="h-3 w-3" /> Next-Gen Transcription
+              Next-Gen Transcription
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-stone-text-primary leading-[1.12] mb-4">
@@ -332,7 +332,7 @@ export default function HomePage() {
                 {/* Header Switcher */}
                 <div className="flex items-center justify-between border-b border-stone-border pb-4 mb-6 select-none">
                   <h3 className="text-xs font-bold text-stone-text-primary flex items-center gap-2">
-                    <Sparkles className="h-3.5 w-3.5 text-brand-primary" /> Audio Capture
+                    Audio Capture
                   </h3>
                   <div className="flex items-center bg-stone-secondary border border-stone-border rounded-lg p-0.5">
                     <button

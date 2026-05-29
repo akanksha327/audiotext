@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Mic, Upload, History, Settings, 
   Menu, X, ChevronLeft, ChevronRight, Search, 
-  Bell, Sun, Moon, LogOut, Sparkles
+  Bell, Sun, Moon, LogOut
 } from 'lucide-react';
 import { useToast } from '../context/ToastContext.jsx';
 import { userService, UserData } from '../services/api.js';
@@ -265,7 +265,6 @@ export default function DashboardLayout() {
               <Menu className="h-4 w-4" />
             </button>
             <h1 className="text-xs font-bold text-stone-text-secondary uppercase tracking-wider flex items-center gap-2 select-none">
-              <Sparkles className="h-3.5 w-3.5 text-brand-primary" />
               <span>{getPageTitle()}</span>
             </h1>
           </div>
