@@ -175,25 +175,25 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
             onDragLeave={handleDrag}
             onDrop={handleDrop}
             onClick={triggerFileInput}
-            className={`flex flex-col items-center justify-center border border-dashed rounded-xl py-12 px-6 text-center cursor-pointer transition-all duration-200 ${
+            className={`flex flex-col items-center justify-center border border-dashed rounded-xl py-8 px-5 text-center cursor-pointer transition-all duration-200 ${
               dragActive
                 ? 'border-brand-primary bg-stone-secondary/50'
                 : 'border-stone-border hover:border-brand-primary bg-stone-card hover:bg-stone-bg/30'
             }`}
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-stone-border bg-stone-bg mb-4 text-brand-primary">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-stone-border bg-stone-bg mb-3 text-brand-primary">
               <Upload className="h-5 w-5" />
             </div>
             
-            <h3 className="text-xs font-semibold text-stone-text-primary mb-1">
+            <h3 className="text-xs font-semibold text-stone-text-primary mb-0.5">
               Drag and drop your audio file
             </h3>
             
-            <p className="text-[11px] text-stone-text-secondary mb-4 max-w-xs">
+            <p className="text-[11px] text-stone-text-secondary mb-3 max-w-xs">
               Supports MP3, WAV, or M4A (Max 25MB)
             </p>
             
-            <span className="text-xs font-medium text-stone-text-primary bg-stone-secondary hover:bg-stone-border px-3.5 py-1.5 rounded-lg border border-stone-border transition-colors">
+            <span className="text-xs font-medium text-stone-text-primary bg-stone-secondary hover:bg-stone-border px-3 py-1 rounded-lg border border-stone-border transition-colors">
               Browse Files
             </span>
           </motion.div>
@@ -205,7 +205,7 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            className="minimal-panel p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            className="minimal-panel p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-stone-border bg-stone-bg text-brand-primary">
@@ -222,13 +222,13 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
             <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
               <button
                 onClick={removeFile}
-                className="flex-1 sm:flex-none text-xs text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-bg border border-stone-border rounded-lg px-3.5 py-2 font-medium transition-colors cursor-pointer"
+                className="flex-1 sm:flex-none text-xs text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-bg border border-stone-border rounded-lg px-3 py-1.5 font-medium transition-colors cursor-pointer"
               >
                 Delete
               </button>
               <button
                 onClick={processAudio}
-                className="flex-1 sm:flex-none text-xs text-white bg-brand-primary hover:bg-brand-primary-hover rounded-lg px-4 py-2 font-medium transition-colors cursor-pointer"
+                className="flex-1 sm:flex-none text-xs text-white bg-brand-primary hover:bg-brand-primary-hover rounded-lg px-3.5 py-1.5 font-medium transition-colors cursor-pointer"
               >
                 Transcribe
               </button>
@@ -242,17 +242,17 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="minimal-panel p-8 text-center flex flex-col items-center justify-center min-h-[220px]"
+            className="minimal-panel p-6 text-center flex flex-col items-center justify-center min-h-[200px]"
           >
-            <div className="flex h-8 w-8 items-center justify-center mb-4 animate-spin text-brand-primary">
+            <div className="flex h-8 w-8 items-center justify-center mb-3 animate-spin text-brand-primary">
               <RefreshCw className="h-5 w-5" />
             </div>
 
-            <h4 className="text-xs font-semibold text-stone-text-primary mb-1">
+            <h4 className="text-xs font-semibold text-stone-text-primary mb-0.5">
               Converting Speech
             </h4>
             
-            <p className="text-[11px] text-stone-text-secondary h-4 mb-4">
+            <p className="text-[11px] text-stone-text-secondary h-4 mb-3">
               {statusSteps[processStep]}
             </p>
 
@@ -273,23 +273,23 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
-            className="minimal-panel p-8 text-center flex flex-col items-center justify-center min-h-[220px]"
+            className="minimal-panel p-6 text-center flex flex-col items-center justify-center min-h-[200px]"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-border bg-stone-bg text-brand-primary mb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-border bg-stone-bg text-brand-primary mb-3">
               <Check className="h-5 w-5" />
             </div>
 
-            <h4 className="text-xs font-bold text-stone-text-primary mb-1">
+            <h4 className="text-xs font-bold text-stone-text-primary mb-0.5">
               Transcription Complete
             </h4>
             
-            <p className="text-[11px] text-stone-text-secondary mb-4 max-w-xs">
+            <p className="text-[11px] text-stone-text-secondary mb-3 max-w-xs">
               Your transcript was compiled and saved to your history.
             </p>
             
             <button
               onClick={() => setSuccess(false)}
-              className="text-xs font-medium text-stone-text-secondary hover:text-brand-primary bg-stone-secondary hover:bg-stone-border border border-stone-border rounded-lg px-4 py-2 transition-colors cursor-pointer"
+              className="text-xs font-medium text-stone-text-secondary hover:text-brand-primary bg-stone-secondary hover:bg-stone-border border border-stone-border rounded-lg px-3 py-1.5 transition-colors cursor-pointer"
             >
               Upload another file
             </button>
@@ -298,7 +298,7 @@ export default function AudioUpload({ onTranscribeComplete }: AudioUploadProps) 
       </AnimatePresence>
 
       {error && (
-        <div className="mt-4 flex items-center gap-2.5 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg p-3.5 text-left">
+        <div className="mt-4 flex items-center gap-2.5 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg p-2.5 text-left">
           <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
           <p>{error}</p>
         </div>

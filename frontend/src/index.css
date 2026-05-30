@@ -20,11 +20,11 @@
 
 /* Default Theme: Dark Mode */
 :root {
-  /* Modern Minimalist Refined Reddish-Brown Color Palette - Dark Mode */
-  --brand-primary: #C26A5A;
-  --brand-primary-hover: #D17C6B;
-  --brand-accent: #C26A5A;
-  --brand-accent-hover: #D17C6B;
+  /* Modern Minimalist Carmine Theme - Dark Mode */
+  --brand-primary: #960018;
+  --brand-primary-hover: #ad1d2c;
+  --brand-accent: #960018;
+  --brand-accent-hover: #ad1d2c;
   
   --stone-bg: #1A1412;
   --stone-secondary: #241B18;
@@ -37,11 +37,11 @@
 
 /* Light Theme overrides */
 html.light {
-  /* Modern Minimalist Refined Reddish-Brown Color Palette - Light Mode */
-  --brand-primary: #A44A3F;
-  --brand-primary-hover: #C26A5A;
-  --brand-accent: #A44A3F;
-  --brand-accent-hover: #C26A5A;
+  /* Modern Minimalist Carmine Theme - Light Mode */
+  --brand-primary: #960018;
+  --brand-primary-hover: #ad1d2c;
+  --brand-accent: #960018;
+  --brand-accent-hover: #ad1d2c;
   
   --stone-bg: #F8F6F4;
   --stone-secondary: #DDD6D3;
@@ -85,8 +85,8 @@ html, body, .minimal-panel, button, input, textarea, select, a, span, p, h1, h2,
 .glass-panel, .minimal-panel {
   background: var(--stone-card) !important;
   border: 1px solid var(--stone-border) !important;
-  box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.04), 0 2px 8px -1px rgba(28, 25, 23, 0.02) !important;
-  border-radius: 12px !important;
+  box-shadow: 0 2px 12px -2px rgba(28, 25, 23, 0.02), 0 1px 6px -1px rgba(28, 25, 23, 0.01) !important;
+  border-radius: 10px !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -97,8 +97,8 @@ html, body, .minimal-panel, button, input, textarea, select, a, span, p, h1, h2,
 
 .glass-panel-interactive:hover, .minimal-panel-interactive:hover {
   border-color: var(--brand-primary) !important;
-  box-shadow: 0 6px 24px -2px rgba(28, 25, 23, 0.06), 0 2px 12px -1px rgba(28, 25, 23, 0.03) !important;
-  transform: translateY(-1px);
+  box-shadow: 0 4px 16px -2px rgba(28, 25, 23, 0.03), 0 2px 8px -1px rgba(28, 25, 23, 0.02) !important;
+  transform: translateY(-0.5px);
 }
 
 /* Highlight transcribing words */

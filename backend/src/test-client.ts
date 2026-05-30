@@ -6,10 +6,21 @@ socket.on('connect', () => {
   console.log('Connected! Socket ID:', socket.id);
   console.log('Emitting start-recording...');
   socket.emit('start-recording');
+
+  setTimeout(() => {
+    console.log('Sending chunk...');
+    socket.emit('audio-chunk', Buffer.alloc(1000));
+  }, 1500);
+
+  setTimeout(() => {
+    console.log('Stopping...');
+    socket.emit('stop-recording', { duration: 5 });
+  }, 4000);
 });
 
 socket.on('connect_error', (err) => {
   console.error('Connect error:', err);
+  process.exit(1);
 });
 
 socket.on('disconnect', (reason) => {
@@ -28,15 +39,6 @@ socket.on('final-transcript', (data) => {
 
 socket.on('error', (err) => {
   console.error('Socket error:', err);
+  process.exit(1);
 });
-
-setTimeout(() => {
-  console.log('Sending chunk...');
-  socket.emit('audio-chunk', Buffer.alloc(1000));
-}, 1500);
-
-setTimeout(() => {
-  console.log('Stopping...');
-  socket.emit('stop-recording', { duration: 5 });
-}, 4000);
 

@@ -279,26 +279,26 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen bg-stone-bg text-stone-text-primary pb-20 font-sans">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
+      <div className="mx-auto max-w-8xl px-4 sm:px-6 lg:px-8 relative">
         
         {/* HERO SECTION */}
-        <section id="hero-main" className="pt-20 pb-16 text-center max-w-3xl mx-auto select-none">
+        <section id="hero-main" className="pt-12 pb-10 text-center max-w-3xl mx-auto select-none">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="flex flex-col items-center"
           >
-            <span className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-[10px] font-semibold bg-stone-secondary border border-stone-border text-stone-text-muted mb-6 uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-[9.5px] font-semibold bg-stone-secondary border border-stone-border text-stone-text-muted mb-4 uppercase tracking-wider">
               Real-Time Voice Transcription
             </span>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-stone-text-primary leading-[1.12] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-stone-text-primary leading-[1.12] mb-4">
               Your Voice, <br />
               <span className="text-stone-text-muted">Captured in Real Time</span>
             </h1>
 
-            <p className="text-xs sm:text-sm md:text-base text-stone-text-secondary max-w-xl leading-relaxed mb-8">
+            <p className="text-xs sm:text-sm text-stone-text-secondary max-w-xl leading-relaxed mb-5">
               Record your voice, convert it into text instantly, and keep everything organized in one place.
             </p>
 
@@ -308,7 +308,7 @@ export default function LandingPage() {
                   setActiveTab('record');
                   scrollToSection('workspace-hub');
                 }}
-                className="w-full sm:w-auto px-6 py-3 inline-flex items-center justify-center gap-2 rounded-lg text-xs font-semibold text-white bg-brand-primary hover:bg-brand-primary-hover shadow-sm transition-all cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 inline-flex items-center justify-center gap-2 rounded-lg text-xs font-semibold text-white bg-brand-primary hover:bg-brand-primary-hover shadow-sm transition-all cursor-pointer"
               >
                 <Mic className="h-4 w-4" /> Start Recording
               </button>
@@ -317,7 +317,7 @@ export default function LandingPage() {
                   setActiveTab('upload');
                   scrollToSection('workspace-hub');
                 }}
-                className="w-full sm:w-auto px-6 py-3 inline-flex items-center justify-center gap-2 rounded-lg text-xs font-semibold text-stone-text-primary bg-stone-card hover:bg-stone-secondary border border-stone-border transition-all cursor-pointer"
+                className="w-full sm:w-auto px-5 py-2.5 inline-flex items-center justify-center gap-2 rounded-lg text-xs font-semibold text-stone-text-primary bg-stone-card hover:bg-stone-secondary border border-stone-border transition-all cursor-pointer"
               >
                 <Upload className="h-4 w-4" /> Upload Audio File
               </button>
@@ -326,22 +326,22 @@ export default function LandingPage() {
         </section>
 
         {/* WORKSPACE SECTION */}
-        <section id="workspace-hub" className="scroll-mt-20 py-8 border-t border-stone-border">
+        <section id="workspace-hub" className="scroll-mt-20 py-6 border-t border-stone-border">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* Capture Cards (Left 5 Cols) */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="minimal-panel p-6 sm:p-7 relative">
+              <div className="minimal-panel p-4 sm:p-5 relative">
                 
                 {/* Header Selector Tabs */}
-                <div className="flex items-center justify-between border-b border-stone-border pb-4 mb-6 select-none">
+                <div className="flex items-center justify-between border-b border-stone-border pb-3 mb-4 select-none">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-stone-text-primary flex items-center gap-1.5">
                     Voice Recorder
                   </h3>
                   <div className="flex items-center bg-stone-secondary border border-stone-border rounded-lg p-0.5">
                     <button
                       onClick={() => setActiveTab('record')}
-                      className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-[10px] font-bold transition-all cursor-pointer ${
+                      className={`flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10px] font-bold transition-all cursor-pointer ${
                         activeTab === 'record'
                           ? 'bg-stone-card text-stone-text-primary shadow-sm border border-stone-border/20'
                           : 'text-stone-text-secondary hover:text-stone-text-primary'
@@ -351,7 +351,7 @@ export default function LandingPage() {
                     </button>
                     <button
                       onClick={() => setActiveTab('upload')}
-                      className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-[10px] font-bold transition-all cursor-pointer ${
+                      className={`flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10px] font-bold transition-all cursor-pointer ${
                         activeTab === 'upload'
                           ? 'bg-stone-card text-stone-text-primary shadow-sm border border-stone-border/20'
                           : 'text-stone-text-secondary hover:text-stone-text-primary'
@@ -363,7 +363,7 @@ export default function LandingPage() {
                 </div>
 
                 {/* Tab Component Body */}
-                <div className="min-h-[220px] flex items-center justify-center">
+                <div className="min-h-[200px] flex items-center justify-center">
                   {activeTab === 'record' ? (
                     <AudioRecorder 
                       onTranscribeComplete={handleTranscribeComplete}
@@ -386,23 +386,23 @@ export default function LandingPage() {
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 5 }}
-                      className="mt-6 border-t border-stone-border pt-4 flex flex-col gap-3 text-left"
+                      className="mt-4 border-t border-stone-border pt-3 flex flex-col gap-3 text-left"
                     >
                       <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider">Recording Details</span>
                       <div className="grid grid-cols-2 gap-2 select-none">
-                        <div className="bg-stone-secondary border border-stone-border rounded-lg p-2.5 flex flex-col">
+                        <div className="bg-stone-secondary border border-stone-border rounded-lg p-2 flex flex-col">
                           <span className="text-[8px] uppercase tracking-wider text-stone-text-secondary">Speech Accuracy</span>
                           <span className="text-sm font-bold text-stone-text-primary font-mono mt-0.5">{accuracyMetrics.pct}%</span>
                         </div>
-                        <div className="bg-stone-secondary border border-stone-border rounded-lg p-2.5 flex flex-col">
+                        <div className="bg-stone-secondary border border-stone-border rounded-lg p-2 flex flex-col">
                           <span className="text-[8px] uppercase tracking-wider text-stone-text-secondary">Clarification</span>
                           <span className="text-sm font-bold text-stone-text-primary mt-0.5">{accuracyMetrics.clarity}</span>
                         </div>
-                        <div className="bg-stone-secondary border border-stone-border rounded-lg p-2.5 flex flex-col">
+                        <div className="bg-stone-secondary border border-stone-border rounded-lg p-2 flex flex-col">
                           <span className="text-[8px] uppercase tracking-wider text-stone-text-secondary">Background Noise</span>
                           <span className="text-sm font-bold text-stone-text-primary mt-0.5">{accuracyMetrics.noise}</span>
                         </div>
-                        <div className="bg-stone-secondary border border-stone-border rounded-lg p-2.5 flex flex-col">
+                        <div className="bg-stone-secondary border border-stone-border rounded-lg p-2 flex flex-col">
                           <span className="text-[8px] uppercase tracking-wider text-stone-text-secondary">Pipeline Engine</span>
                           <span className="text-[9px] font-bold text-brand-primary mt-1.5 flex items-center gap-1 uppercase tracking-wider">
                             <span className="h-1.5 w-1.5 rounded-full bg-stone-text-muted animate-pulse" /> Stream
@@ -418,10 +418,10 @@ export default function LandingPage() {
 
             {/* Live Transcription Panel (Right 7 Cols) */}
             <div id="transcription-pane" className="lg:col-span-7 scroll-mt-20">
-              <div className="minimal-panel p-6 sm:p-7 flex flex-col h-full min-h-[460px] text-left">
+              <div className="minimal-panel p-4 sm:p-5 flex flex-col h-full min-h-[400px] text-left">
                 
                 {/* Panel Actions Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-border pb-4 mb-4 select-none">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-border pb-3 mb-3 select-none">
                   <div className="flex flex-col gap-1">
                     <h3 className="text-xs font-bold text-stone-text-primary uppercase tracking-wider">Live Transcript</h3>
                     <div className="flex flex-wrap items-center gap-3 mt-1 text-[10px] text-stone-text-secondary">
@@ -452,15 +452,15 @@ export default function LandingPage() {
                     <div className="flex items-center gap-1.5 self-end sm:self-auto">
                       <button
                         onClick={handleCopy}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg border border-stone-border text-stone-text-secondary hover:text-stone-text-primary hover:bg-stone-bg transition-colors cursor-pointer bg-stone-card"
+                        className="h-7 w-7 flex items-center justify-center rounded-lg border border-stone-border text-stone-text-secondary hover:text-stone-text-primary hover:bg-stone-bg transition-colors cursor-pointer bg-stone-card"
                         title="Copy Text"
                       >
-                        {copied ? <Check className="h-4 w-4 text-stone-text-primary" /> : <Copy className="h-4 w-4" />}
+                        {copied ? <Check className="h-3.5 w-3.5 text-stone-text-primary" /> : <Copy className="h-3.5 w-3.5" />}
                       </button>
                       
                       <button
                         onClick={handleDownloadTxt}
-                        className="h-8 px-2.5 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-lg border border-stone-border text-stone-text-secondary hover:text-stone-text-primary hover:bg-stone-bg transition-colors cursor-pointer bg-stone-card"
+                        className="h-7 px-2 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-lg border border-stone-border text-stone-text-secondary hover:text-stone-text-primary hover:bg-stone-bg transition-colors cursor-pointer bg-stone-card"
                         title="Export TXT"
                       >
                         TXT
@@ -468,7 +468,7 @@ export default function LandingPage() {
 
                       <button
                         onClick={handleDownloadPdf}
-                        className="h-8 px-2.5 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-lg border border-stone-border text-stone-text-secondary hover:text-stone-text-primary hover:bg-stone-bg transition-colors cursor-pointer bg-stone-card"
+                        className="h-7 px-2 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-lg border border-stone-border text-stone-text-secondary hover:text-stone-text-primary hover:bg-stone-bg transition-colors cursor-pointer bg-stone-card"
                         title="Export PDF"
                       >
                         PDF
@@ -476,10 +476,10 @@ export default function LandingPage() {
                       
                       <button
                         onClick={handleClear}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg border border-stone-border hover:border-brand-primary text-stone-text-secondary hover:text-stone-text-primary hover:bg-stone-bg transition-colors cursor-pointer bg-stone-card"
+                        className="h-7 w-7 flex items-center justify-center rounded-lg border border-stone-border hover:border-brand-primary text-stone-text-secondary hover:text-stone-text-primary hover:bg-stone-bg transition-colors cursor-pointer bg-stone-card"
                         title="Clear Workspace"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   )}
@@ -494,7 +494,7 @@ export default function LandingPage() {
                         value={transcript}
                         onChange={(e) => setTranscript(e.target.value)}
                         placeholder={recordingState === 'recording' ? "Listening and capturing audio signals..." : "Transcribed text appears here..."}
-                        className="w-full flex-grow text-xs leading-relaxed text-stone-text-primary bg-stone-secondary/20 hover:bg-stone-secondary/40 focus:bg-stone-card border border-stone-border focus:border-brand-primary rounded-xl p-4 min-h-[300px] outline-none transition-colors duration-150 resize-none font-sans"
+                        className="w-full flex-grow text-xs leading-relaxed text-stone-text-primary bg-stone-secondary/20 hover:bg-stone-secondary/40 focus:bg-stone-card border border-stone-border focus:border-brand-primary rounded-xl p-3 min-h-[250px] outline-none transition-colors duration-150 resize-none font-sans"
                       />
                       {recordingState === 'recording' && (
                         <div className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-stone-card border border-stone-border px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider text-brand-primary select-none shadow-sm">
@@ -504,8 +504,8 @@ export default function LandingPage() {
                       )}
                     </div>
                   ) : (
-                    <div className="flex-grow flex flex-col items-center justify-center text-stone-text-secondary py-20 border border-dashed border-stone-border rounded-xl select-none bg-stone-secondary/10">
-                      <FileText className="h-8 w-8 text-stone-text-muted/40 mb-2" />
+                    <div className="flex-grow flex flex-col items-center justify-center text-stone-text-secondary py-14 border border-dashed border-stone-border rounded-xl select-none bg-stone-secondary/10">
+                      <FileText className="h-7 w-7 text-stone-text-muted/40 mb-2" />
                       <p className="text-xs font-semibold">Start recording to see your transcript here.</p>
                     </div>
                   )}
@@ -518,7 +518,7 @@ export default function LandingPage() {
         </section>
 
         {/* HISTORICAL CATALOG */}
-        <section id="history-list" className="py-12 border-t border-stone-border scroll-mt-20">
+        <section id="history-list" className="py-8 border-t border-stone-border scroll-mt-20">
           <div className="text-left mb-6">
             <h2 className="text-lg font-bold text-stone-text-primary flex items-center gap-2">
               <ListFilter className="h-4.5 w-4.5 text-brand-primary" /> Recording History
@@ -528,7 +528,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="bg-stone-card border border-stone-border rounded-xl p-5 sm:p-6 shadow-sm">
+          <div className="bg-stone-card border border-stone-border rounded-xl p-4 sm:p-5 shadow-sm">
             <TranscriptionHistory
               transcripts={transcripts}
               onDelete={handleDelete}

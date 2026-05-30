@@ -269,7 +269,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[500px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[420px]">
         
         {/* Left Side: Directory List */}
         <div className="lg:col-span-5 flex flex-col">
@@ -277,22 +277,22 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
           {/* Search and Date Filter Row */}
           <div className="flex gap-2 mb-4 select-none">
             <div className="relative flex-grow">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-stone-text-secondary" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-stone-text-secondary" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search transcripts..."
-                className="w-full text-xs text-stone-text-primary bg-stone-card border border-stone-border focus:border-brand-primary outline-none rounded-lg pl-9 pr-4 py-2.5 transition-colors"
+                className="w-full text-xs text-stone-text-primary bg-stone-card border border-stone-border focus:border-brand-primary outline-none rounded-lg pl-9 pr-4 py-2 transition-colors"
               />
             </div>
 
             <div className="relative shrink-0">
-              <CalendarDays className="absolute left-2.5 top-3 h-3.5 w-3.5 text-stone-text-secondary pointer-events-none" />
+              <CalendarDays className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-stone-text-secondary pointer-events-none" />
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value as any)}
-                className="text-xs text-stone-text-primary bg-stone-card border border-stone-border focus:border-brand-primary outline-none rounded-lg pl-8 pr-6 py-2.5 appearance-none cursor-pointer"
+                className="text-xs text-stone-text-primary bg-stone-card border border-stone-border focus:border-brand-primary outline-none rounded-lg pl-8 pr-6 py-2 appearance-none cursor-pointer"
               >
                 <option value="all">All Time</option>
                 <option value="today">Today</option>
@@ -302,7 +302,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
           </div>
 
           {/* Catalog items list */}
-          <div className="flex-1 max-h-[460px] overflow-y-auto space-y-2 pr-1 select-none">
+          <div className="flex-1 max-h-[380px] overflow-y-auto space-y-2 pr-1 select-none">
             {loading ? (
               <div className="py-16 text-center text-xs text-stone-text-secondary">
                 <RefreshCw className="h-4 w-4 animate-spin mx-auto mb-2 text-brand-primary" />
@@ -319,7 +319,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                   <div
                     key={item._id}
                     onClick={() => setSelectedId(item._id || null)}
-                    className={`p-4 border rounded-xl cursor-pointer text-left transition-all duration-200 ${
+                    className={`p-3 border rounded-lg cursor-pointer text-left transition-all duration-200 ${
                       isActive
                         ? 'bg-stone-secondary border-brand-primary shadow-sm'
                         : 'bg-stone-card border-stone-border hover:bg-stone-secondary/50'
@@ -334,7 +334,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                       </span>
                     </div>
                     
-                    <p className="text-[11px] text-stone-text-secondary line-clamp-2 leading-relaxed mb-3">
+                    <p className="text-[11px] text-stone-text-secondary line-clamp-2 leading-relaxed mb-2">
                       {item.text}
                     </p>
                     
@@ -363,10 +363,10 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.99 }}
                 transition={{ duration: 0.15 }}
-                className="minimal-panel p-6 flex flex-col h-full text-left"
+                className="minimal-panel p-5 flex flex-col h-full text-left"
               >
                 {/* Header metadata bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-border pb-4 mb-4 select-none">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-border pb-3 mb-3 select-none">
                   
                   {isRenaming ? (
                     <div className="flex-1 flex items-center gap-2">
@@ -374,17 +374,17 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                         type="text"
                         value={renameValue}
                         onChange={(e) => setRenameValue(e.target.value)}
-                        className="text-xs font-bold text-stone-text-primary bg-stone-secondary border border-stone-border focus:border-brand-primary outline-none rounded-lg px-2.5 py-1.5 flex-1"
+                        className="text-xs font-bold text-stone-text-primary bg-stone-secondary border border-stone-border focus:border-brand-primary outline-none rounded-lg px-2 py-1 flex-1"
                       />
                       <button 
                         onClick={handleSaveRename}
-                        className="text-[10px] font-bold text-white bg-brand-primary hover:bg-brand-primary-hover px-2.5 py-1.5 rounded-lg border border-brand-primary cursor-pointer"
+                        className="text-[10px] font-bold text-white bg-brand-primary hover:bg-brand-primary-hover px-2 py-1 rounded-lg border border-brand-primary cursor-pointer"
                       >
                         Save
                       </button>
                       <button 
                         onClick={() => setIsRenaming(false)}
-                        className="text-[10px] font-bold text-stone-text-secondary hover:text-stone-text-primary bg-stone-card border border-stone-border px-2.5 py-1.5 rounded-lg cursor-pointer"
+                        className="text-[10px] font-bold text-stone-text-secondary hover:text-stone-text-primary bg-stone-card border border-stone-border px-2 py-1 rounded-lg cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -417,7 +417,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                     <div className="flex items-center gap-1.5 self-end sm:self-auto">
                       <button
                         onClick={() => handleCopy(selectedTranscript._id!, selectedTranscript.text)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg border border-stone-border hover:border-brand-primary text-stone-text-secondary hover:text-stone-text-primary bg-stone-card transition-colors cursor-pointer"
+                        className="h-7 w-7 flex items-center justify-center rounded-lg border border-stone-border hover:border-brand-primary text-stone-text-secondary hover:text-stone-text-primary bg-stone-card transition-colors cursor-pointer"
                         title="Copy text"
                       >
                         {copiedId === selectedTranscript._id ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
@@ -425,7 +425,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
 
                       <button
                         onClick={() => handleDownloadTxt(selectedTranscript)}
-                        className="h-8 px-2 flex items-center justify-center rounded-lg border border-stone-border hover:border-brand-primary text-stone-text-secondary hover:text-stone-text-primary bg-stone-card transition-colors cursor-pointer text-[9px] font-bold uppercase tracking-wider"
+                        className="h-7 px-2 flex items-center justify-center rounded-lg border border-stone-border hover:border-brand-primary text-stone-text-secondary hover:text-stone-text-primary bg-stone-card transition-colors cursor-pointer text-[9px] font-bold uppercase tracking-wider"
                         title="Export TXT"
                       >
                         TXT
@@ -433,7 +433,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
 
                       <button
                         onClick={() => handleDownloadPdf(selectedTranscript)}
-                        className="h-8 px-2 flex items-center justify-center rounded-lg border border-stone-border hover:border-brand-primary text-stone-text-secondary hover:text-stone-text-primary bg-stone-card transition-colors cursor-pointer text-[9px] font-bold uppercase tracking-wider"
+                        className="h-7 px-2 flex items-center justify-center rounded-lg border border-stone-border hover:border-brand-primary text-stone-text-secondary hover:text-stone-text-primary bg-stone-card transition-colors cursor-pointer text-[9px] font-bold uppercase tracking-wider"
                         title="Export PDF"
                       >
                         PDF
@@ -463,7 +463,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                       ) : (
                         <button
                           onClick={() => setDeleteConfirmId(selectedTranscript._id || null)}
-                          className="h-8 w-8 flex items-center justify-center rounded-lg border border-red-200 hover:border-red-400 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                          className="h-7 w-7 flex items-center justify-center rounded-lg border border-red-200 hover:border-red-400 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                           title="Delete transcript"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -474,15 +474,15 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                 </div>
 
                 {/* Waveform seekbar */}
-                <div className="bg-stone-secondary border border-stone-border rounded-xl p-4 mb-4 select-none flex items-center gap-4">
+                <div className="bg-stone-secondary border border-stone-border rounded-xl p-3 mb-3 select-none flex items-center gap-3">
                   <button
                     onClick={() => setIsPlaying(!isPlaying)}
-                    className="h-9 w-9 shrink-0 rounded-lg bg-brand-primary hover:bg-brand-primary-hover flex items-center justify-center text-white transition-colors cursor-pointer shadow-sm"
+                    className="h-8 w-8 shrink-0 rounded-lg bg-brand-primary hover:bg-brand-primary-hover flex items-center justify-center text-white transition-colors cursor-pointer shadow-sm"
                   >
                     {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
                   </button>
 
-                  <div className="flex-1 flex flex-col gap-1 text-left">
+                  <div className="flex-grow flex flex-col gap-1 text-left">
                     <span className="text-[9px] text-stone-text-secondary font-bold uppercase tracking-wider">Audio Playback Preview</span>
                     <div className="h-6 flex items-end gap-[3px] w-full cursor-pointer relative">
                       {[...Array(40)].map((_, idx) => {
@@ -505,12 +505,12 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                 </div>
 
                 {/* Tabs */}
-                <div className="flex border-b border-stone-border mb-4 select-none overflow-x-auto">
+                <div className="flex border-b border-stone-border mb-3 select-none overflow-x-auto">
                   {(['transcript', 'summary', 'insights', 'translation'] as TabType[]).map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
-                      className={`px-4 py-2 text-xs font-bold border-b-2 capitalize transition-colors cursor-pointer whitespace-nowrap ${
+                      className={`px-3.5 py-1.5 text-xs font-bold border-b-2 capitalize transition-colors cursor-pointer whitespace-nowrap ${
                         activeTab === tab
                           ? 'border-brand-primary text-stone-text-primary'
                           : 'border-transparent text-stone-text-secondary hover:text-stone-text-primary'
@@ -522,7 +522,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                 </div>
 
                 {/* Tab contents */}
-                <div className="flex-1 min-h-[160px] max-h-[200px] overflow-y-auto pr-1 bg-stone-secondary/20 border border-stone-border rounded-xl p-4">
+                <div className="flex-1 min-h-[145px] max-h-[180px] overflow-y-auto pr-1 bg-stone-secondary/20 border border-stone-border rounded-lg p-3">
                   <AnimatePresence mode="wait">
                     
                     {/* Tab 1: Full transcript body */}
@@ -601,7 +601,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                         <div>
                           <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider block mb-2">Sentiment Profile</span>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="bg-stone-card border border-stone-border rounded-lg p-2.5">
+                            <div className="bg-stone-card border border-stone-border rounded-lg p-2">
                               <div className="flex items-center justify-between text-xs mb-1">
                                 <span className="text-stone-text-secondary font-medium">Confident</span>
                                 <span className="font-mono text-stone-text-primary font-bold">{getSentimentScore(selectedTranscript.text).posPct}%</span>
@@ -611,7 +611,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                               </div>
                             </div>
 
-                            <div className="bg-stone-card border border-stone-border rounded-lg p-2.5">
+                            <div className="bg-stone-card border border-stone-border rounded-lg p-2">
                               <div className="flex items-center justify-between text-xs mb-1">
                                 <span className="text-stone-text-secondary font-medium">Technical</span>
                                 <span className="font-mono text-stone-text-primary font-bold">{getSentimentScore(selectedTranscript.text).analPct}%</span>
@@ -626,7 +626,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <span className="text-[10px] font-bold text-stone-text-secondary uppercase tracking-wider block mb-1.5">Speaking Statistics</span>
-                            <div className="flex items-center gap-4 text-xs text-stone-text-secondary bg-stone-card border border-stone-border rounded-lg p-2.5">
+                            <div className="flex items-center gap-4 text-xs text-stone-text-secondary bg-stone-card border border-stone-border rounded-lg p-2">
                               <div>
                                 <p className="font-mono text-base text-stone-text-primary font-bold">148</p>
                                 <p className="text-[9px] uppercase tracking-wider mt-0.5">Pace (WPM)</p>
@@ -677,7 +677,7 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                           </select>
                         </div>
 
-                        <div className="text-xs text-stone-text-primary leading-relaxed italic bg-stone-card p-3 rounded-lg border border-stone-border">
+                        <div className="text-xs text-stone-text-primary leading-relaxed italic bg-stone-card p-2.5 rounded-lg border border-stone-border">
                           {getMockTranslationText(selectedTranscript, selectedLang)}
                         </div>
                       </motion.div>
@@ -687,8 +687,8 @@ export default function TranscriptionHistory({ transcripts, onDelete, onRename, 
                 </div>
               </motion.div>
             ) : (
-              <div className="h-full min-h-[350px] border border-dashed border-stone-border rounded-2xl flex flex-col items-center justify-center text-stone-text-secondary text-xs select-none">
-                <FileText className="h-8 w-8 text-stone-text-secondary/50 mb-2" />
+              <div className="h-full min-h-[300px] border border-dashed border-stone-border rounded-xl flex flex-col items-center justify-center text-stone-text-secondary text-xs select-none bg-stone-secondary/10">
+                <FileText className="h-7 w-7 text-stone-text-secondary/50 mb-2" />
                 Select an item in history to view transcription details.
               </div>
             )}

@@ -161,12 +161,12 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
           : 'bg-transparent border-transparent'
       }`}
     >
-      <div className="mx-auto flex max-w-7xl h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-8xl h-14 items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* Brand Logo - Burgundy */}
         <a href="/" className="flex items-center gap-2 group select-none">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-brand-primary/30 bg-stone-card text-brand-primary shadow-sm relative">
-            <Mic className="h-4 w-4 text-brand-primary relative z-10" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-brand-primary/30 bg-stone-card text-brand-primary shadow-sm relative">
+            <Mic className="h-3.5 w-3.5 text-brand-primary relative z-10" />
             <span className="absolute inset-0 rounded-lg bg-brand-primary/10 animate-ping opacity-60 scale-95" />
           </div>
           <div className="flex flex-col items-start leading-none">
@@ -188,7 +188,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
               const el = document.getElementById('workspace-hub');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="hidden sm:inline-flex items-center justify-center text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-secondary border border-stone-border rounded-lg px-3.5 py-1.5 transition-all shadow-sm cursor-pointer select-none"
+            className="hidden sm:inline-flex items-center justify-center text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-secondary border border-stone-border rounded-lg px-3 py-1 transition-all shadow-sm cursor-pointer select-none"
           >
             Workspace
           </button>
@@ -199,7 +199,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
               const el = document.getElementById('history-list');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="hidden sm:inline-flex items-center justify-center text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-secondary border border-stone-border rounded-lg px-3.5 py-1.5 transition-all shadow-sm cursor-pointer select-none"
+            className="hidden sm:inline-flex items-center justify-center text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-secondary border border-stone-border rounded-lg px-3 py-1 transition-all shadow-sm cursor-pointer select-none"
           >
             History
           </button>
@@ -208,7 +208,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'history' ? null : 'history')}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-all cursor-pointer ${
+              className={`flex h-7 w-7 items-center justify-center rounded-lg border transition-all cursor-pointer ${
                 activeDropdown === 'history'
                   ? 'border-brand-primary bg-brand-primary/5 text-brand-primary'
                   : 'border-stone-border text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-secondary'
@@ -280,7 +280,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'settings' ? null : 'settings')}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-all cursor-pointer ${
+              className={`flex h-7 w-7 items-center justify-center rounded-lg border transition-all cursor-pointer ${
                 activeDropdown === 'settings'
                   ? 'border-brand-primary bg-brand-primary/5 text-brand-primary'
                   : 'border-stone-border text-stone-text-secondary hover:text-stone-text-primary bg-stone-card hover:bg-stone-secondary'
@@ -418,7 +418,7 @@ export default function Navbar({ onScrollToApp }: NavbarProps) {
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'profile' ? null : 'profile')}
-              className={`flex h-8 w-8 items-center justify-center rounded-full border overflow-hidden transition-all cursor-pointer bg-brand-primary text-white text-xs font-bold ${
+              className={`flex h-7 w-7 items-center justify-center rounded-full border overflow-hidden transition-all cursor-pointer bg-brand-primary text-white text-[10px] font-bold ${
                 activeDropdown === 'profile' ? 'ring-2 ring-brand-primary' : 'border-stone-border hover:border-brand-primary'
               }`}
             >

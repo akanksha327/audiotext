@@ -504,7 +504,7 @@ export default function AudioRecorder({
             className="flex flex-col items-center justify-center w-full max-w-md"
           >
             {/* Pulsing Mic Circle Button */}
-            <div className="relative mb-8 flex items-center justify-center">
+            <div className="relative mb-6 flex items-center justify-center">
               {isRecording && !isPaused && (
                 <>
                   <motion.span 
@@ -522,7 +522,7 @@ export default function AudioRecorder({
               
               <button
                 onClick={isRecording ? stopRecording : startRecording}
-                className={`h-24 w-24 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl cursor-pointer ${
+                className={`h-20 w-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl cursor-pointer ${
                   isRecording && !isPaused
                     ? 'bg-brand-primary border border-brand-primary text-white shadow-brand-primary/30'
                     : 'bg-stone-card border border-stone-border text-brand-primary hover:border-brand-primary shadow-black/40 hover:scale-[1.03]'
@@ -530,19 +530,19 @@ export default function AudioRecorder({
                 title={isRecording ? 'Stop Recording' : 'Start Recording'}
               >
                 {isRecording && !isPaused ? (
-                  <Square className="h-7 w-7 fill-white text-white animate-pulse" />
+                  <Square className="h-6 w-6 fill-white text-white animate-pulse" />
                 ) : (
-                  <Mic className="h-9 w-9" />
+                  <Mic className="h-8 w-8" />
                 )}
               </button>
             </div>
 
             {/* Timer Counter */}
-            <div className="text-4xl font-extrabold tracking-tight text-stone-text-primary mb-1 font-mono select-none">
+            <div className="text-3xl font-extrabold tracking-tight text-stone-text-primary mb-1 font-mono select-none">
               {formatTime(recordingTime)}
             </div>
             
-            <p className="text-[10px] text-stone-text-muted tracking-widest uppercase font-bold mb-6">
+            <p className="text-[10px] text-stone-text-muted tracking-widest uppercase font-bold mb-4">
               {isRecording 
                 ? isPaused ? 'Recording Paused' : 'Listening...' 
                 : 'Tap to start recording'
@@ -550,12 +550,12 @@ export default function AudioRecorder({
             </p>
 
             {/* Visualizer Canvas (Visible only when recording) */}
-            <div className="w-full h-16 flex items-center justify-center overflow-hidden transition-all duration-300">
+            <div className="w-full h-12 flex items-center justify-center overflow-hidden transition-all duration-300">
               {isRecording && (
                 <canvas 
                   ref={canvasRef} 
                   width={340} 
-                  height={60} 
+                  height={50} 
                   className="w-full h-full max-w-[340px] opacity-80"
                 />
               )}
@@ -563,10 +563,10 @@ export default function AudioRecorder({
 
             {/* Secondary Controls Bar */}
             {isRecording && (
-              <div className="flex items-center justify-center gap-3 mt-4">
+              <div className="flex items-center justify-center gap-3 mt-3">
                 <button
                   onClick={isPaused ? resumeRecording : pauseRecording}
-                  className="h-10 px-4 rounded-xl bg-stone-secondary hover:bg-stone-card border border-stone-border text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+                  className="h-9 px-3 rounded-lg bg-stone-secondary hover:bg-stone-card border border-stone-border text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary flex items-center gap-2 transition-all cursor-pointer shadow-sm"
                   title={isPaused ? 'Resume' : 'Pause'}
                 >
                   {isPaused ? <Play className="h-3.5 w-3.5 fill-current" /> : <Pause className="h-3.5 w-3.5" />}
@@ -577,7 +577,7 @@ export default function AudioRecorder({
 
             {/* Error notifications */}
             {error && (
-              <div className="mt-6 flex items-center gap-2.5 text-xs text-red-400 bg-red-950/20 border border-red-900/30 rounded-xl p-3.5 text-left">
+              <div className="mt-4 flex items-center gap-2.5 text-xs text-red-400 bg-red-950/20 border border-red-900/30 rounded-lg p-2.5 text-left">
                 <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
                 <p className="font-medium leading-normal">{error}</p>
               </div>
@@ -595,15 +595,15 @@ export default function AudioRecorder({
             exit={{ opacity: 0, scale: 0.98 }}
             className="flex flex-col w-full text-left max-w-sm"
           >
-            <h4 className="text-[10px] font-bold text-stone-text-muted uppercase tracking-widest mb-3">
+            <h4 className="text-[10px] font-bold text-stone-text-muted uppercase tracking-widest mb-2">
               Audio Recording Preview
             </h4>
 
             {/* Stylized Player Widget */}
-            <div className="flex items-center gap-3 bg-stone-secondary border border-stone-border rounded-2xl p-4 mb-4 select-none shadow-md">
+            <div className="flex items-center gap-3 bg-stone-secondary border border-stone-border rounded-xl p-3 mb-3 select-none shadow-sm">
               <button
                 onClick={togglePlayback}
-                className="h-10 w-10 rounded-xl bg-stone-card border border-stone-border text-brand-primary hover:bg-brand-primary hover:text-white hover:border-brand-primary flex items-center justify-center transition-all cursor-pointer"
+                className="h-9 w-9 rounded-lg bg-stone-card border border-stone-border text-brand-primary hover:bg-brand-primary hover:text-white hover:border-brand-primary flex items-center justify-center transition-all cursor-pointer"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 fill-current" />}
@@ -617,7 +617,7 @@ export default function AudioRecorder({
 
             {/* Display final computed accuracy rating */}
             {accuracy !== null && (
-              <div className="mb-6 bg-stone-secondary/40 border border-stone-border rounded-xl p-3.5 flex items-center justify-between text-xs select-none">
+              <div className="mb-4 bg-stone-secondary/40 border border-stone-border rounded-lg p-2.5 flex items-center justify-between text-xs select-none">
                 <span className="text-stone-text-secondary font-semibold">Estimated Accuracy:</span>
                 <span className="font-mono font-bold text-brand-primary bg-stone-card px-2 py-0.5 rounded border border-stone-border/40">
                   {accuracy}%
@@ -629,13 +629,13 @@ export default function AudioRecorder({
             <div className="flex items-center gap-3">
               <button
                 onClick={handleDiscard}
-                className="flex-1 flex items-center justify-center gap-1.5 text-xs text-stone-text-secondary hover:text-red-500 bg-stone-card hover:bg-red-950/10 border border-stone-border hover:border-red-900/30 rounded-xl py-3 font-semibold transition-all cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1.5 text-xs text-stone-text-secondary hover:text-red-500 bg-stone-card hover:bg-red-950/10 border border-stone-border hover:border-red-900/30 rounded-lg py-2.5 font-semibold transition-all cursor-pointer"
               >
                 <Trash2 className="h-4 w-4" /> Delete
               </button>
               <button
                 onClick={startRecording}
-                className="flex-1 flex items-center justify-center gap-1.5 text-xs text-white bg-brand-primary hover:bg-brand-primary-hover rounded-xl py-3 font-semibold transition-all cursor-pointer shadow-lg shadow-brand-primary/10"
+                className="flex-1 flex items-center justify-center gap-1.5 text-xs text-white bg-brand-primary hover:bg-brand-primary-hover rounded-lg py-2.5 font-semibold transition-all cursor-pointer shadow-lg shadow-brand-primary/10"
               >
                 New Recording <ArrowRight className="h-4 w-4" />
               </button>
