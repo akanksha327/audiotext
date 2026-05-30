@@ -48,6 +48,36 @@ const dgTranscripts: Record<string, string> = {};
 const dgLastEmitted: Record<string, string> = {};
 const dgQueue: Record<string, Buffer[]> = {};
 
+// Helper to calculate delta of words with punctuation stripped to prevent duplicate words
+function emitDeltaTranscript(socket: any, transcript: string, isFinal: boolean) {
+  const socketId = socket.id;
+  const cleanWord = (w: string) => w.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
+  const lastText = dgLastEmitted[socketId] || "";
+  const lastWords = lastText.trim().split(/\s+/).filter(Boolean);
+  const newWords = transcript.trim().split(/\s+/).filter(Boolean);
+  
+  let matchCount = 0;
+  while (matchCount < lastWords.length && matchCount < newWords.length && 
+         cleanWord(newWords[matchCount]) === cleanWord(lastWords[matchCount])) {
+    matchCount++;
+  }
+  
+  const deltaWords = newWords.slice(matchCount);
+  const deltaText = deltaWords.join(" ");
+  
+  if (isFinal) {
+    dgTranscripts[socketId] = (dgTranscripts[socketId] ? dgTranscripts[socketId] + " " : "") + transcript;
+    dgLastEmitted[socketId] = "";
+  } else {
+    dgLastEmitted[socketId] = transcript;
+  }
+  
+  if (deltaText) {
+    socket.emit('live-transcript', deltaText);
+    console.log(`[Socket] Delta transcript emitted: "${deltaText}"`);
+  }
+}
+
 // Configure Socket.IO real-time audio pipeline
 io.on('connection', (socket) => {
   console.log("Client connected");
@@ -58,6 +88,7 @@ io.on('connection', (socket) => {
     dgTranscripts[socket.id] = "";
     dgLastEmitted[socket.id] = "";
     dgQueue[socket.id] = [];
+    dgConnections[socket.id] = "connecting"; // Synchronous placeholder to block fallback race
     
     const apiKey = process.env.DEEPGRAM_API_KEY;
     if (apiKey && apiKey !== 'your_deepgram_api_key_here') {
@@ -70,8 +101,34 @@ io.on('connection', (socket) => {
           interim_results: true,
         } as any);
 
+        const handleFailure = () => {
+          if (dgConnections[socket.id] === connection || dgConnections[socket.id] === "connecting") {
+            delete dgConnections[socket.id];
+            
+            // Flush queue to Whisper fallback so we don't lose the user's speech
+            const queue = dgQueue[socket.id] || [];
+            if (queue.length > 0) {
+              console.log(`[Socket] Deepgram failure. Flushing ${queue.length} queued chunks to Whisper fallback.`);
+              whisperService.startSession(socket.id);
+              for (const buf of queue) {
+                whisperService.appendChunk(socket.id, buf);
+              }
+              dgQueue[socket.id] = [];
+              
+              whisperService.getPartialTranscript(socket.id).then(text => {
+                emitDeltaTranscript(socket, text, false);
+              });
+            } else {
+              console.log(`[Socket] Deepgram failure. Starting Whisper fallback session.`);
+              whisperService.startSession(socket.id);
+            }
+          }
+        };
+
         connection.on('open', () => {
           console.log("Deepgram connected");
+          if (dgConnections[socket.id] !== connection) return;
+
           const queue = dgQueue[socket.id] || [];
           while (queue.length > 0) {
             const buf = queue.shift();
@@ -83,54 +140,28 @@ io.on('connection', (socket) => {
         });
 
         connection.on('message', (data: any) => {
+          if (dgConnections[socket.id] !== connection) return;
           const alternatives = data.channel?.alternatives || [];
           const transcript = alternatives[0]?.transcript || '';
           const isFinal = data.is_final || false;
           
           if (transcript) {
             console.log("Deepgram transcript received: " + transcript);
-            
-            // Calculate delta of words with punctuation stripped to prevent duplicate words
-            const cleanWord = (w: string) => w.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "");
-            const lastText = dgLastEmitted[socket.id] || "";
-            const lastWords = lastText.trim().split(/\s+/).filter(Boolean);
-            const newWords = transcript.trim().split(/\s+/).filter(Boolean);
-            
-            let matchCount = 0;
-            while (matchCount < lastWords.length && matchCount < newWords.length && 
-                   cleanWord(newWords[matchCount]) === cleanWord(lastWords[matchCount])) {
-              matchCount++;
-            }
-            
-            const deltaWords = newWords.slice(matchCount);
-            const deltaText = deltaWords.join(" ");
-            
-            if (isFinal) {
-              dgTranscripts[socket.id] = (dgTranscripts[socket.id] ? dgTranscripts[socket.id] + " " : "") + transcript;
-              dgLastEmitted[socket.id] = "";
-            } else {
-              dgLastEmitted[socket.id] = transcript;
-            }
-            
-            if (deltaText) {
-              // Stream transcript back to frontend in real time (raw string segment)
-              socket.emit('live-transcript', deltaText);
-              console.log("Transcript emitted to frontend");
-            }
+            emitDeltaTranscript(socket, transcript, isFinal);
           } else {
             const lastChunkSize = (socket as any).lastChunkSize || 0;
-            console.log(`[Deepgram] Received empty transcript. Last chunk size: ${lastChunkSize} bytes. Deepgram connection state (readyState): ${connection.readyState}. Socket connected: ${socket.connected}.`);
+            console.log(`[Deepgram] Received empty transcript. Last chunk size: ${lastChunkSize} bytes.`);
           }
         });
 
         connection.on('error', (err: any) => {
           console.error(`[Deepgram] Live connection error for socket ${socket.id}:`, err);
-          delete dgConnections[socket.id];
+          handleFailure();
         });
 
         connection.on('close', () => {
           console.log(`[Deepgram] Live connection closed for socket: ${socket.id}`);
-          delete dgConnections[socket.id];
+          handleFailure();
         });
 
         // ACTUALLY CONNECT THE WEBSOCKET STREAM
@@ -139,9 +170,12 @@ io.on('connection', (socket) => {
         dgConnections[socket.id] = connection;
       } catch (e) {
         console.error('[Deepgram] Initialization failed:', e);
+        delete dgConnections[socket.id];
+        whisperService.startSession(socket.id);
       }
     } else {
       console.warn(`[Deepgram] API key not found, using mock streaming fallback for socket ${socket.id}`);
+      delete dgConnections[socket.id];
       whisperService.startSession(socket.id);
     }
   });
@@ -156,9 +190,17 @@ io.on('connection', (socket) => {
     console.log("Buffer created");
 
     const dgConn = dgConnections[socket.id];
-    // Check if dgConn exists and is in a valid state. If closed, clean it up and run fallback.
-    if (dgConn && dgConn.readyState !== 3 && dgConn.readyState !== 2) {
-      if (dgConn.readyState === 1) { // 1 is OPEN
+    
+    if (dgConn === "connecting") {
+      console.log(`[Socket] Deepgram connecting. Queueing chunk.`);
+      if (!dgQueue[socket.id]) {
+        dgQueue[socket.id] = [];
+      }
+      dgQueue[socket.id].push(buffer);
+    } else if (dgConn && typeof dgConn !== "string") {
+      const socketState = dgConn.socket ? dgConn.socket.readyState : dgConn.readyState;
+      
+      if (socketState === 1) { // 1 is OPEN
         const queue = dgQueue[socket.id] || [];
         while (queue.length > 0) {
           const buf = queue.shift();
@@ -169,24 +211,25 @@ io.on('connection', (socket) => {
         }
         dgConn.sendMedia(buffer);
         console.log("Chunk sent to Deepgram");
-      } else if (dgConn.readyState === 0) { // 0 is CONNECTING
-        console.log(`[Socket] Deepgram connecting. Queueing chunk.`);
+      } else if (socketState === 0 || socketState === 3) { // 0 is CONNECTING, 3 is CLOSED (before connect resolves)
+        console.log(`[Socket] Deepgram connecting/initializing (state: ${socketState}). Queueing chunk.`);
         if (!dgQueue[socket.id]) {
           dgQueue[socket.id] = [];
         }
         dgQueue[socket.id].push(buffer);
+      } else {
+        console.log(`[Socket] Deepgram state is closed/closing (${socketState}). Cleaning up and running Whisper fallback.`);
+        delete dgConnections[socket.id];
+        whisperService.appendChunk(socket.id, buffer);
+        const text = await whisperService.getPartialTranscript(socket.id);
+        emitDeltaTranscript(socket, text, false);
       }
     } else {
       // Fallback simulated STT
-      if (dgConn) {
-        console.log(`[Socket] Deepgram state is closed/closing (${dgConn.readyState}). Cleaning up and running Whisper fallback.`);
-        delete dgConnections[socket.id];
-      }
       const chunkBuffer = Buffer.from(chunk);
       whisperService.appendChunk(socket.id, chunkBuffer);
       const text = await whisperService.getPartialTranscript(socket.id);
-      dgTranscripts[socket.id] = text;
-      socket.emit('live-transcript', text);
+      emitDeltaTranscript(socket, text, false);
       console.log("Transcript emitted to frontend");
     }
   });
@@ -194,11 +237,14 @@ io.on('connection', (socket) => {
   socket.on('stop-recording', async (metadata: { title?: string; duration?: number; fileName?: string; fileSize?: number; mimeType?: string }) => {
     try {
       const dgConn = dgConnections[socket.id];
-      if (dgConn) {
-        if (dgConn.readyState === 1) {
+      if (dgConn && typeof dgConn !== "string") {
+        const socketState = dgConn.socket ? dgConn.socket.readyState : dgConn.readyState;
+        if (socketState === 1) {
           dgConn.sendFinalize({ type: 'Finalize' });
         }
         dgConn.close();
+        delete dgConnections[socket.id];
+      } else if (dgConn === "connecting") {
         delete dgConnections[socket.id];
       }
 
@@ -209,7 +255,6 @@ io.on('connection', (socket) => {
         console.log(`[Socket] Deepgram transcript empty on stop, finalizing via Whisper fallback.`);
         finalCompiledText = await whisperService.finalizeTranscript(socket.id);
       } else {
-        // Clean up Whisper session just in case it was running
         await whisperService.finalizeTranscript(socket.id);
       }
       
@@ -266,12 +311,12 @@ io.on('connection', (socket) => {
   socket.on('discard-recording', () => {
     console.log(`[Socket] Discard recording session for: ${socket.id}`);
     const dgConn = dgConnections[socket.id];
-    if (dgConn) {
+    if (dgConn && typeof dgConn !== "string") {
       try {
         dgConn.close();
       } catch (e) {}
-      delete dgConnections[socket.id];
     }
+    delete dgConnections[socket.id];
     delete dgTranscripts[socket.id];
     delete dgLastEmitted[socket.id];
     delete dgQueue[socket.id];
@@ -281,13 +326,14 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log(`Socket client disconnected: ${socket.id}`);
     const dgConn = dgConnections[socket.id];
-    if (dgConn) {
-      if (dgConn.readyState === 1) {
+    if (dgConn && typeof dgConn !== "string") {
+      const socketState = dgConn.socket ? dgConn.socket.readyState : dgConn.readyState;
+      if (socketState === 1) {
         dgConn.sendFinalize({ type: 'Finalize' });
       }
       dgConn.close();
-      delete dgConnections[socket.id];
     }
+    delete dgConnections[socket.id];
     delete dgTranscripts[socket.id];
     delete dgLastEmitted[socket.id];
     delete dgQueue[socket.id];

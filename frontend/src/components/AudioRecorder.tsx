@@ -3,6 +3,7 @@ import { Square, Play, Pause, AlertCircle, Mic, Trash2, ArrowRight, RotateCcw } 
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 
+/*
 const getDialectCode = (lang: string): string => {
   const mapping: Record<string, string> = {
     'en': 'en-US',
@@ -17,6 +18,7 @@ const getDialectCode = (lang: string): string => {
   };
   return mapping[lang] || lang || 'en-US';
 };
+*/
 
 interface AudioRecorderProps {
   onTranscribeComplete: (
@@ -148,7 +150,7 @@ export default function AudioRecorder({
     setRecordingTime(0);
 
     let socket: any = null;
-    let recognition: any = null;
+    // let recognition: any = null;
 
     try {
       const selectedMicId = localStorage.getItem('voxnote_mic') || 'default';
@@ -183,7 +185,7 @@ export default function AudioRecorder({
         
         // Use backend stream to update the transcript
         setTranscript((prev) => {
-          const updated = prev + " " + text;
+          const updated = (prev ? prev + " " : "") + text;
           console.log('Transcript state updated:', updated);
           onTextStream(updated);
           return updated;
@@ -224,7 +226,8 @@ export default function AudioRecorder({
         socket.disconnect();
       });
 
-      // 2. Initialize Web Speech API SpeechRecognition as a free client-side local assist
+      // 2. Local SpeechRecognition disabled to prevent clashes with backend real-time transcription
+      /*
       const SpeechRecognitionClass = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognitionClass) {
         recognition = new SpeechRecognitionClass();
@@ -278,6 +281,7 @@ export default function AudioRecorder({
           recognition.start();
         } catch (e) {}
       }
+      */
 
       // 3. Initialize Audio Analyser node for Live Waveform visualizer
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -323,7 +327,7 @@ export default function AudioRecorder({
       };
 
       // Start recording and triggers
-      recorder.start(1000); // Emit chunk every 1000ms (1 second)
+      recorder.start(250); // Emit chunk every 250ms (0.25 seconds) for low-latency live streaming
       setIsRecording(true);
       setIsPaused(false);
       onStateChange('recording');
