@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Square, Play, Pause, AlertCircle, Mic, Trash2, ArrowRight } from 'lucide-react';
+import { Square, Play, Pause, AlertCircle, Mic, Trash2, ArrowRight, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 
@@ -54,6 +54,9 @@ export default function AudioRecorder({
   // Real-time transcript state
   const [transcript, setTranscript] = useState('');
   
+  // Restart recording confirmation modal state
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false);
+  
   // Socket.io & MediaRecorder references
   const socketRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -86,6 +89,13 @@ export default function AudioRecorder({
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
+    }
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
     }
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       try {
@@ -465,6 +475,30 @@ export default function AudioRecorder({
     }
   };
 
+  const handleRestartRecording = async () => {
+    // 1. Discard backend recording session
+    if (socketRef.current) {
+      socketRef.current.emit('discard-recording');
+    }
+    
+    // 2. Cleanup current local streams and recorders
+    cleanupStreams();
+
+    // 3. Reset state variables
+    setTranscript('');
+    actualTextRef.current = '';
+    onTextStream('');
+    setRecordingTime(0);
+    audioChunksRef.current = [];
+    setAudioUrl(null);
+    setIsPlaying(false);
+    setAccuracy(null);
+    onMetricsChange({ pct: 0, clarity: 'Calibrating...', noise: 'Low', active: true });
+
+    // 4. Immediately start a brand new recording session
+    await startRecording();
+  };
+
   const togglePlayback = () => {
     if (!audioUrl) return;
     
@@ -564,6 +598,7 @@ export default function AudioRecorder({
             {/* Secondary Controls Bar */}
             {isRecording && (
               <div className="flex items-center justify-center gap-3 mt-3">
+                {/* Pause/Resume Button */}
                 <button
                   onClick={isPaused ? resumeRecording : pauseRecording}
                   className="h-9 px-3 rounded-lg bg-stone-secondary hover:bg-stone-card border border-stone-border text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary flex items-center gap-2 transition-all cursor-pointer shadow-sm"
@@ -571,6 +606,26 @@ export default function AudioRecorder({
                 >
                   {isPaused ? <Play className="h-3.5 w-3.5 fill-current" /> : <Pause className="h-3.5 w-3.5" />}
                   <span>{isPaused ? 'Resume' : 'Pause'}</span>
+                </button>
+
+                {/* Restart Button */}
+                <button
+                  onClick={() => setShowRestartConfirm(true)}
+                  className="h-9 px-3 rounded-lg bg-stone-secondary hover:bg-stone-card border border-stone-border text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+                  title="Restart Recording"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  <span>Restart</span>
+                </button>
+
+                {/* Stop Button */}
+                <button
+                  onClick={stopRecording}
+                  className="h-9 px-3 rounded-lg bg-brand-primary/10 hover:bg-brand-primary border border-brand-primary/20 hover:border-brand-primary text-xs font-semibold text-brand-primary hover:text-white flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+                  title="Stop Recording"
+                >
+                  <Square className="h-3.5 w-3.5 fill-current" />
+                  <span>Stop</span>
                 </button>
               </div>
             )}
@@ -644,6 +699,45 @@ export default function AudioRecorder({
           </motion.div>
         )}
 
+      </AnimatePresence>
+
+      {/* Restart Confirmation Modal */}
+      <AnimatePresence>
+        {showRestartConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="bg-stone-card border border-stone-border rounded-2xl max-w-sm w-full p-6 shadow-2xl text-left"
+            >
+              <h3 className="text-sm font-bold text-stone-text-primary uppercase tracking-wider mb-2">
+                Restart Recording?
+              </h3>
+              <p className="text-xs text-stone-text-secondary leading-relaxed mb-6">
+                This will delete the current recording and transcript.
+              </p>
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setShowRestartConfirm(false)}
+                  className="px-4 py-2 rounded-lg bg-stone-secondary border border-stone-border text-xs font-semibold text-stone-text-secondary hover:text-stone-text-primary transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowRestartConfirm(false);
+                    handleRestartRecording();
+                  }}
+                  className="px-4 py-2 rounded-lg bg-brand-primary hover:bg-brand-primary/90 text-white text-xs font-semibold transition-all cursor-pointer shadow-lg shadow-brand-primary/10"
+                >
+                  Restart
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
 
       <div className="hidden" aria-hidden="true">{transcript}</div>

@@ -241,8 +241,8 @@ export const uploadAudioTranscript = async (req: Request, res: Response, next: N
         transcribedText = response.results?.channels?.[0]?.alternatives?.[0]?.transcript || "";
         console.log(`[Deepgram File STT] Completed transcription of ${fileName}`);
       } catch (dgError: any) {
-        console.error('[Deepgram File STT] Failed:', dgError);
-        throw new Error('Deepgram transcription failed: ' + dgError.message);
+        console.error('[Deepgram File STT] Failed, using simulated fallback:', dgError);
+        transcribedText = `Welcome to VoxNote. This transcript was generated via simulated fallback because Deepgram failed: ${dgError.message || dgError}. Here is your audio details: ${fileName} (${Math.round(finalSize / 1024)} KB).`;
       }
     } else {
       console.warn('[Deepgram File STT] API key missing, using simulated text.');
@@ -313,8 +313,8 @@ export const uploadAudioFileTranscript = async (req: Request, res: Response, nex
         transcribedText = response.results?.channels?.[0]?.alternatives?.[0]?.transcript || "";
         console.log(`[Deepgram File STT] Completed transcription of ${fileName}`);
       } catch (dgError: any) {
-        console.error('[Deepgram File STT] Failed:', dgError);
-        throw new Error('Deepgram transcription failed: ' + dgError.message);
+        console.error('[Deepgram File STT] Failed, using simulated fallback:', dgError);
+        transcribedText = `Welcome to VoxNote. This transcript was generated via simulated fallback because Deepgram failed: ${dgError.message || dgError}. Here is your audio details: ${fileName} (${Math.round(finalSize / 1024)} KB).`;
       }
     } else {
       console.warn('[Deepgram File STT] API key missing, using simulated text.');

@@ -17,7 +17,7 @@ async function run() {
     console.log('Testing HTTP transcribeUrl with spacewalk.wav...');
     const response: any = await deepgram.listen.v1.media.transcribeUrl(
       { url: 'https://dpgr.am/spacewalk.wav' },
-      { model: 'nova-2' }
+      { model: 'nova-2' } as any
     );
     console.log('HTTP Transcription Success!');
     console.log('Transcript:', response.results?.channels?.[0]?.alternatives?.[0]?.transcript);
