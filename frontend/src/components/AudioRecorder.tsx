@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Square, Play, Pause, AlertCircle, Mic, Trash2, ArrowRight, RotateCcw } from 'lucide-react';
+import { Square, Play, Pause, AlertCircle, Mic, Trash2, ArrowRight, RotateCcw, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 
@@ -565,7 +565,7 @@ export default function AudioRecorder({
                     ? 'bg-brand-primary border border-brand-primary text-white shadow-brand-primary/30'
                     : 'bg-stone-card border border-stone-border text-brand-primary hover:border-brand-primary shadow-black/40 hover:scale-[1.03]'
                 }`}
-                title={isRecording ? 'Stop Recording' : 'Start Recording'}
+                title={isRecording ? 'Save Recording' : 'Start Recording'}
               >
                 {isRecording && !isPaused ? (
                   <Square className="h-6 w-6 fill-white text-white animate-pulse" />
@@ -622,14 +622,14 @@ export default function AudioRecorder({
                   <span>Restart</span>
                 </button>
 
-                {/* Stop Button */}
+                {/* Save Recording Button */}
                 <button
                   onClick={stopRecording}
                   className="h-9 px-3 rounded-lg bg-brand-primary/10 hover:bg-brand-primary border border-brand-primary/20 hover:border-brand-primary text-xs font-semibold text-brand-primary hover:text-white flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-                  title="Stop Recording"
+                  title="Save Recording"
                 >
-                  <Square className="h-3.5 w-3.5 fill-current" />
-                  <span>Stop</span>
+                  <Check className="h-3.5 w-3.5" />
+                  <span>Save Recording</span>
                 </button>
               </div>
             )}
@@ -654,6 +654,11 @@ export default function AudioRecorder({
             exit={{ opacity: 0, scale: 0.98 }}
             className="flex flex-col w-full text-left max-w-sm"
           >
+            <div className="mb-3 flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 px-3 py-1.5 rounded-lg text-xs font-semibold text-green-700">
+              <Check className="h-4 w-4" />
+              <span>Recording saved successfully!</span>
+            </div>
+
             <h4 className="text-[10px] font-bold text-stone-text-muted uppercase tracking-widest mb-2">
               Audio Recording Preview
             </h4>
